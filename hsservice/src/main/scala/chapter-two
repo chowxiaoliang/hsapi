@@ -1,0 +1,96 @@
+Chapter2:spark introduction
+
+introduction to core spark concepts
+
+driver program (驱动程序)
+ 1.在高层次上，每个Spark应用程序都由一个驱动程序组成，该驱动程序在集群上启动各种并行操作。
+ 2.驱动程序通过Spark上下文对象(sparkContext)访问Spark，该对象表示与计算集群的连接。
+
+ sparkContext(spark上下文对象)
+ 1. 一旦你有了Spark上下文，你就可以使用它来构建弹性分布式数据集，或RDD。我们调用Spark Context.text File来创建一个RDD，
+    表示文件中的文本行。 然后，我们可以对这些行进行各种操作，例如计数count()
+ 2. 为了运行这些操作，驱动程序通常管理一些名为执行器的节点。 例如，如果我们在集群上运行上面的计数()，不同的机器可能会在文件的不同范围内计数行。
+     因为我们刚刚在本地运行了Spark shell，它在一台机器上执行了它的所有工作-但是您可以将同一个shell连接到一个集群来并行分析数据。
+ 3. 最后，Spark的许多API都围绕着将函数传递给其操作符来在集群上运行它们。 例如，我们可以通过过滤文件中包含单词的行来扩展我们的自述示例，例如“Python”：
+    val lines = sc.textFile("README.md")
+    val pythonLines = lines.filter(line => line.contains("python"))
+    返回文件的第一行内容
+    lines.first()
+
+NOTE
+    1.
+     如果您不熟悉上面的lambda或=>语法，这是在Python和Scala中内联定义函数的一种速记方法。
+     在这些语言中使用Spark时，您还可以单独定义一个函数，然后将其名称传递给Spark。 例如，在Python中：
+     def hasPython(line):
+        return "Python" in line
+
+     pythonLines = lines.filter(hasPython)
+
+     在Java中，将函数传递给Spark也是可能的，但在这种情况下，它们被定义为类，实现了一个名为Function的接口。 例如：
+     JavaRDD<String> pythonLines = lines.filter(
+        new Function<String, Boolean>(){
+            Boolean call(String line){
+                return line.contains("python")
+            }
+        }
+     )
+
+     Java8引入了名为“lambdas”的速记语法，它看起来类似于Python和Scala。 下面是代码使用这种语法的方式：
+     JavaRDD<String> pythonLines = lines.filter(line -> line.contains("python"))
+
+     2.
+     虽然我们稍后将更详细地介绍SparkAPI，但它的许多神奇之处在于，基于功能的操作（如过滤器）也在集群中并行化。
+     也就是说，Spark自动接受您的函数(例如。 包含(“Python”)并将其发送到执行器节点。
+     因此，您可以在单个驱动程序中编写代码，并自动将其部分运行在多个节点上。
+
+Standalone Applications （独立应用程序）
+     在这个快速的spark之旅中缺少的最后一部分是如何在独立程序中使用它。 除了交互运行外，Spark还可以在Java、Scala或Python中链接到独立应用程序。
+     与在shell中使用它的主要区别在于您需要初始化自己的Spark上下文。 其后，API都是相同的。
+
+     链接到Spark的过程因语言而异。 在Java和Scala中，您给应用程序提供了对Apache发布的火花核心工件的Maven依赖。 截至编写时，
+     最新的Spark版本为1.0.0，Maven坐标为：
+     groupId = org.apache.spark
+     artifactId = spark-core_2.10
+     version = 1.0.0
+
+     如果您不熟悉Maven，一个流行的基于Java语言的包管理工具，允许您链接到公共存储库中的库。 您可以使用Maven本身来构建项目，或者使用其他可以与Maven存储库对话的工具，
+     包括Scala的SBT工具或Gradle。流行的集成开发环境，如Eclipse，也允许您直接向项目添加Maven依赖项。
+
+
+Initializing a SparkContext (初始化一个spark上下文)
+     一旦您将应用程序链接到Spark，您需要导入程序中的Spark包并创建Spark上下文。 首先创建一个SparkConf对象来配置应用程序，然后为其构建SparkContext。
+     以下是每种支持语言的简短例子：
+
+     java:
+     import org.apache.spark.SparkConf;
+     import org.apache.spark.api.java.JavaSparkContext;
+     SparkConf conf = new SparkConf().setMaster("local").setAppName("My App");
+     JavaSparkContext sc = new JavaSparkContext(conf);
+
+     scala:
+     import org.apache.spark.SparkConf
+     import org.apache.spark.SparkContext
+     import org.apache.spark.SparkContext._
+     val conf = new SparkConf().setMaster("local").setAppName("My App")
+     val sc = new SparkContext("local", "My App")
+
+     这些示例显示了初始化Spark上下文的最小方法，其中传递了两个参数：
+     1.集群URL，即这些示例中的“本地”，它告诉Spark如何连接到集群。“本地”是一个特殊的值，它在本地机器上的一个线程上运行Spark，而不连接到一个集群。
+     2.应用程序名称，即这些示例中的“我的应用程序”。如果您连接到集群，这将在集群管理器的UI上标识您的应用程序。
+
+
+     还存在用于配置应用程序如何执行或添加要发送到集群的代码的附加参数，但我们将在本书的后面章节中讨论这些参数。
+     在初始化了Spark上下文之后，您可以使用我们以前展示的所有方法来创建RDDs(例如。 从文本文件中)并操作它们。
+
+     最后，要关闭Spark，您可以在Spark上下文上调用停止stop()方法，也可以简单地退出应用程序(例如:使用System.exit（0）或sys.exit（)）。
+
+     这个快速预览应该足以让您在笔记本电脑上运行一个独立的Spark应用程序。对于更高级的配置，本书的后面一章将介绍如何连接应用程序到集群，包括打包应用程序，以便其代码自动发送到工作节点。
+
+
+ 总结：
+     在本章中，我们介绍了下载Spark，在笔记本电脑上本地运行它，并以交互方式或从独立应用程序中使用它。我们简要概述了核心概念，参与使用Spark编程：一个驱动程序创建Spark上下文和RDDS，然后对它们运行并行操作。
+     在下一章中，我们将更深入地研究RDD是如何操作的。
+
+
+
+
