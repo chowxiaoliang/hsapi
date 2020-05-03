@@ -1,0 +1,38 @@
+spark伪集合操作
+1.
+rdd1=tom tomas tomaslee
+rdd2=tomas tomaslee jerry bob
+
+val rdd1 = sc.parallelize(List("tom","tomas","tomaslee"))
+val rdd2 = sc.parallelize(List("tomas","tomaslee","jerry","bob"))
+2.rdd.distinct()
+    去重
+    rdd1.distinct()
+3.union
+    联合
+
+4.subtract
+    减法
+
+5.intersection
+    交集
+
+6.cartesian （返回所有的键值对）
+    笛卡尔积
+    val rdd1 = sc.parallelize(List("tom","tomas","tomaslee"))
+    val rdd2 = sc.parallelize(List("tomas","tomaslee","jerry","bob"))
+    val rdd3 = rdd1.cartesian(rdd2)
+    rdd3.collect
+
+    Array[(String, String)] = Array((tom,tomas), (tom,tomaslee), (tom,jerry), (tom,bob), (tomas,tomas), (tomas,tomaslee), (tomas,jerry), (tomas,bob), (tomaslee,tomas), (tomaslee,tomaslee), (tomaslee,jerry), (tomaslee,bob))
+
+7.zip （要求：两个集合的元素个数相同，partition相同）
+    val rdd1 = sc.parallelize(List("tom","tomas","tomaslee"))
+    val rdd2 = sc.parallelize(List("tomas","tomaslee","jerry"))
+    val rdd3 = rdd1.zip(rdd2)
+    rdd3.collect
+
+    Array[(String, String)] = Array((tom,tomas), (tomas,tomaslee), (tomaslee,jerry))
+
+
+
