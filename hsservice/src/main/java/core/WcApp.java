@@ -41,6 +41,8 @@ public class WcApp {
             return Arrays.asList(strings).iterator();
         });
 
+        words.filter(x -> x.contains("name"));
+
         JavaPairRDD<String, Integer> counts = words.mapToPair((PairFunction<String, String, Integer>) s -> new Tuple2<>(s, 1));
 
         JavaPairRDD<String, Integer> result = counts.reduceByKey((Function2<Integer, Integer, Integer>) (v1, v2) -> v1 + v2);

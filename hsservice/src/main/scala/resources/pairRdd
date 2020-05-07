@@ -1,0 +1,186 @@
+pairRdd里面相关的transformations and actions
+
+生成pairRdd的方式：
+    1.val rdd = sparkContext.parallelize(List((1,2),(1,3),(2,1)))
+    2.val lineRdd = sparkContext.textFile("README.md")
+      val filterRdd = lineRdd.filter(x => x.contains("name"))
+      val mapRdd = filterRdd.map(x => (x,1))
+
+    val rdd = sc.parallelize(List((1,2),(3,4),(3,6)))
+transformations
+    1.reduceByKey 合并具有相同key的value值
+    val result = rdd.reduceByKey((x,y)=>x+y)
+    result.foreach(println)
+    (1,2)
+    (3,10)
+
+    2.groupByKey 对具有相同键的进行分组 [数据分组]
+    val result = rdd.groupByKey()
+    (1,CompactBuffer(2))
+    (3,CompactBuffer(4,6))
+
+    3.combineByKey
+    作用： 将RDD[(K,V)] => RDD[(K,C)] 表示V的类型可以转成C两者可以不同类型。
+    def combineByKey[C](createCombiner:V =>C ,mergeValue:(C，V) =>C, mergeCombiners:(C,C) =>C):RDD[(K,C)]
+    def combineByKey[C](createCombiner:V =>C ,mergeValue:(C，V) =>C, mergeCombiners:(C,C) =>C,numPartitions:Int ):RDD[(K,C)]
+    def combineByKey[C](createCombiner:V =>C ,mergeValue:(C，V) =>C, mergeCombiners:(C,C) =>C,partitioner:Partitioner,mapSideCombine:Boolean=true,serializer:Serializer= null):RDD[(K,C)]
+    第一个函数和第二个函数默认使用的是HashPartitioner、serialize为null。
+    说明：
+    1）createCombiner:在遍历RDD的数据集合过程中，对于遍历到的(k,v)，如果combineByKey第一次遇到值为k的Key（类型K），那么将对这个(k,v)调用 createCombiner函数，它的作用是将v转换为c(类型是C，聚合对象的类型，c作为局和对象的初始值)。
+    2）mergeValue：    在遍历RDD的数据集合过程中，对于遍历到的(k,v)，如果combineByKey不是第一次(或者第二次，第三次…)遇到值为k的Key（类型K），那么将对这个 (k,v)调用mergeValue函数，它的作用是将v累加到聚合对象（类型C）中，mergeValue的类型是(C,V)=>C,参数中的C遍历到此处的聚合对象，然后对v 进行聚合得到新的聚合对象值。
+    3）mergeCombiners：因为combineByKey是在分布式环境下执行，RDD的每个分区单独进行combineByKey操作，最后需要对各个分区的结果进行最后的聚合，它的函数类型是(C,C)=>C，每个参数是分区聚合得到的聚合对象
+    例子：(例子来源：https://www.jianshu.com/p/c994e33f3c22)
+    val data = sc.parallelize(List(("1","3"),("1","2"),("1","5"),("2","3")))
+    val natPairRdd = data.combineByKey(List(_), (c: List[String], v: String) => v::c, (c1: List[String], c2: List[String]) => c1 ::: c2)
+    natPairRdd.collect
+    res0: Array[(String, List[String])] = Array((1,List(3, 2, 5)), (2,List(3)))
+
+    4.aggregateByKey
+    aggregateByKey使用了函数柯里化,存在两个参数列表
+    1）第一个参数列表表示分区内计算时的初始值（零值）
+    2）第二个参数列表需要传两个参数：
+    1.第一个参数表示分区内计算规则
+    2.第二个参数表示分区间计算规则
+    根据key进行聚合，直观理解就是按照Key进行聚合。转化： RDD[(K,V)] ==> RDD[(K,U)]
+    可以看出是返回值的类型不需要和原来的RDD的Value类型一致的。在聚合过程中提供一个中立的初始值。
+    原型：
+    def  aggregateByKey[U:ClassTag](zeroValue:U, partitioner:Partitioner)(seqOp:(U,V) =>U, comOp:(U,U) =>U):RDD[(K,U)]
+    def  aggregateByKey[U:ClassTag](zeroValue:U, numPartitions:Int)(seqOp:(U,V) =>U, comOp:(U,U) =>U):RDD[(K,U)]
+    def  aggregateByKey[U:ClassTag](zeroValue:U)(seqOp:(U,V) =>U, comOp:(U,U) =>U):RDD[(K,U)]
+    1、 第一个可以自己定义分区Partitioner; 2、第二个设置了分区数，最终定义了和HashPartitioner； 3、第三个会判断当前RDD是否定义分区函数，如果定义了则用当前的分区函数，没定义，则使用HashPartitioner
+    例子：(例子来源：https://www.jianshu.com/p/3a64b6e01d10)
+    val data = sc.parallelize(List((1,2),(1,4),(2,3)))
+    data.aggregateByKey(3)((x,y)=>math.max(x,y) ,(z,m)=>z+m)
+    val result = data.aggregateByKey(3)((x,y)=>math.max(x,y) ,(z,m)=>z+m)
+    result.collect
+    res2: Array[(Int, Int)] = Array((1,7), (2,3))
+
+    5.foldByKey
+    函数原型：
+    def foldByKey(zeroValue: V)(func: (V, V) => V): RDD[(K, V)]
+    def foldByKey(zeroValue: V, numPartitions: Int)(func: (V, V) => V): RDD[(K, V)]
+    def foldByKey(zeroValue: V, partitioner: Partitioner)(func: (V, V) => V): RDD[(K, V)]
+    作用：将RDD[K,V]根据K将V做折叠、合并处理，zeroValue作为初始参数，调用func得到V，再根据Key按照func对V进行调用。
+    例子：(例子来源：https://www.jianshu.com/p/cd9465a23e3c)
+    var rdd1 = sc.makeRDD(Array(("A",0),("A",2),("B",1),("B",2)))
+    rdd1.foldByKey(0)(_+_).collect
+    res3: Array[(String, Int)] = Array((A,2), (B,3))
+    说明： 将0应用到_+_上，Array(("A",0+0),("A",2+0)) 再进一步处理得到Array(("A",0+2))最终得到Array(("A",2))
+
+    6.countByKey/countByValue
+
+    7.mapValues(func) 对pairRDD中的每个值应用func,键不改变
+    val result = rdd.mapValues(x=>x+1)
+    result.foreach(println)
+    (1,3)
+    (3,5)
+    (3,7)
+
+    8.flatMapValues(func) 类似于mapValues,返回的是迭代器函数
+    val result = rdd.flatMapValues(x=>(x to 5))
+    result.foreach(println)
+    (3,4)
+    (3,5)
+    (1,2)
+    (1,3)
+    (1,4)
+    (1,5)
+
+    9.keys 返回一个仅包含键的RDD
+    val result = rdd.keys
+    result.foreach(println)
+    3
+    1
+    3
+
+    10.values 返回一个仅包含value的RDD
+    val result = rdd.values
+    result.foreach(println)
+    2
+    4
+    6
+
+    11.sortByKey() 返回一个根据键排序的RDD
+    数据排序，可以通过接受ascending的参数表示我们是否想要结果按升序排序（默认是true）
+    val result = rdd.sortByKey().collect()
+    result: Array[(Int, Int)] = Array((1,2), (3,4), (3,6))
+
+    val result = rdd.sortByKey(ascending=false).collect()
+    result: Array[(Int, Int)] = Array((3,4), (3,6), (1,2))
+
+    12.针对两个pairRDD的转化操作
+    假设：rdd={(1,2),(3,4),(3,6)} other={(3,9)}
+
+    函数名	            目的	                                示例	                    结果
+    substractByKey	    删掉RDD中键与other RDD中的键相同的元素	rdd.subtractByKey(other)	{（1,2）}
+    join	            对两个RDD进行内连接	                    rdd.join(other)	            {(3,(4,9)),(3,(6,9))}
+    rightOuterJoin	    对两个RDD进行连接操作，右外连接	        rdd.rightOuterJoin(other)	{(3,(4,9)),(3,(6,9))}
+    leftOuterJoin	    对两个RDD进行连接操作，左外连接	        rdd.rightOuterJoin(other)	{(1,(2,None)),(3,(4,9)),(3,(6,9))}
+    cogroup	            将两个RDD中拥有相同键的数据分组	        rdd.cogroup(other)	        {1,([2],[]),(3,[4,6],[9])}
+
+    13.过滤操作
+    假设rdd={(1,2),(3,4),(3,6)}
+        对value做控制，key不加限制条件
+        val result = rdd.filter{case(x,y)=>y%3==0}
+        result.foreach(println)
+        (3,6)
+
+        val result = rdd.filter{case(x,y)=>y<=4}
+        result.foreach(println)
+        (1,2)
+        (3,4)
+
+        对key做控制，value不控制
+        val result = rdd.filter{case(x,y)=>x<3}
+        result.foreach(println)
+        (1,2)
+
+    14.聚合操作
+    使用reduceByKey()和mapValues()计算每个键对应的平均值
+    val rdd = sc.parallelize(List(Tuple2("panda",0),Tuple2("pink",3),Tuple2("pirate",3),Tuple2("panda",1),Tuple2("pink",4)))
+    val result = rdd.mapValues(x=>(x,1)).reduceByKey((x,y)=>(x._1+y._1,x._2+y._2))
+    result.foreach(println)
+    (pirate,(3,1))
+    (panda,(1,2))
+    (pink,(7,2))
+
+    15.实现经典的分布式单词计数问题
+    val rdd = sc.parallelize(List("i am zhouliang, i love scala"))
+    1.使用flatMap() 来生成以单词为键，以数字1为值的pairRDD
+    val words = rdd.flatMap(line => line.split(" "))
+    val result = words.map(x=>(x,1)).reduceByKey((x,y) => x+y)
+    result.foreach(println)
+    (am,1)
+    (zhouliang,1)
+    (i,2)
+    (love,1)
+    (scala,1)
+
+    2.使用countByValue更快的实现单词计数
+    val result = rdd.flatMap(x=>x.split(" ")).countByValue()
+    result.foreach(println)
+    (am,1)
+    (zhouliang,1)
+    (i,2)
+    (love,1)
+    (scala,1)
+
+    16.并行度调优
+    每个RDD都有固定数目的分区，分区数决定了在RDD 上执行操作时的并行度，在执行聚合或分组函数时，可以要求Spark使用给定的分区，
+    Spark始终尝试根据集群的大小，推断出一个有意义的默认值，但是有时候你可能要对并行度进行调优来获取更好的性能发展。
+
+    scala中自定义reduceByKey()的并行度
+    val data = Seq(("a",3),("b",4),("c",5))
+    sc.parallelize(data).reduceByKey((x,y)=>x+y) //默认并行度
+    sc.parallelize(data).reduceByKey((x,y)=>x+y,10) //自定义并行度
+
+
+actions
+    和转化操作一样，所有基础RDD支持的传统行动操作也都在pairRDD上可用，pairRDD提供了一些额外的行动操作，可以让我们充分利用数据的键值对特性，如下
+    以键值对集合{（1，2），（3，4），（3，6）}为例
+
+    函数名	        描述	                            示例	                结果
+    countByKey	    对每个键对应的元素分别计数	        rdd.countByKey(other)	{(1,1),(3,2)}
+    collectAsMap()	将结果以映射表的形式返回，以便查询	rdd.collectAsMap()	    Map{(1,2),(3,4),(3,6)}
+    lookup(key)	    返回给定键对应的所有值	            rdd.lookup(3)	        [4,6]
+
