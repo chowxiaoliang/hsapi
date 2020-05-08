@@ -14,24 +14,19 @@ object WcAppS {
   def main(args: Array[String]): Unit = {
     val sparkConf = new SparkConf()
     sparkConf.setMaster("local[4]")
-    sparkConf.setAppName("wordcoud")
+    sparkConf.setAppName("wordcount")
 
     val sparkContext = new SparkContext(sparkConf)
 
-    val lines = sparkContext.textFile("E:\\myproject\\bigdata\\inputOne\\wordcount-spark.txt")
+    val lines = sparkContext.textFile("D:\\bigdata\\wordcount.txt")
 
     val words = lines.flatMap(x => x.split(","))
 
-    words.mapPartitions(x => {
-      val list = new ListBuffer[String]
-      list.iterator
-    }
-    )
+//    val counts = words.map(w => (w, 1)).reduceByKey((x, y) => x + y)
+//    counts.saveAsTextFile("D:\\bigdata\\wordcount-result.txt")
 
-    val counts = words.map(w => (w, 1)).reduceByKey((x, y) => x + y)
-
-    counts.saveAsTextFile("E:\\myproject\\bigdata\\inputOne\\wordcount-spark-result-scala.txt")
-
+    val counts = words.countByValue();
+    counts.foreach(x => println(x))
 
   }
 

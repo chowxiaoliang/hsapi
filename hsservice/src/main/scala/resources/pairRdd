@@ -29,7 +29,7 @@ transformations
     1）createCombiner:在遍历RDD的数据集合过程中，对于遍历到的(k,v)，如果combineByKey第一次遇到值为k的Key（类型K），那么将对这个(k,v)调用 createCombiner函数，它的作用是将v转换为c(类型是C，聚合对象的类型，c作为局和对象的初始值)。
     2）mergeValue：    在遍历RDD的数据集合过程中，对于遍历到的(k,v)，如果combineByKey不是第一次(或者第二次，第三次…)遇到值为k的Key（类型K），那么将对这个 (k,v)调用mergeValue函数，它的作用是将v累加到聚合对象（类型C）中，mergeValue的类型是(C,V)=>C,参数中的C遍历到此处的聚合对象，然后对v 进行聚合得到新的聚合对象值。
     3）mergeCombiners：因为combineByKey是在分布式环境下执行，RDD的每个分区单独进行combineByKey操作，最后需要对各个分区的结果进行最后的聚合，它的函数类型是(C,C)=>C，每个参数是分区聚合得到的聚合对象
-    例子：(例子来源：https://www.jianshu.com/p/c994e33f3c22)
+    例子：(例子来源：https://www.jianshu.com/p/c994e33f3c22 / https://blog.csdn.net/qq_41946557/article/details/103130444)
     val data = sc.parallelize(List(("1","3"),("1","2"),("1","5"),("2","3")))
     val natPairRdd = data.combineByKey(List(_), (c: List[String], v: String) => v::c, (c1: List[String], c2: List[String]) => c1 ::: c2)
     natPairRdd.collect
