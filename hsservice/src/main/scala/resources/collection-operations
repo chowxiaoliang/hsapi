@@ -1,0 +1,44 @@
+1.union 把两个RDD进行逻辑上的合并
+    val rdd = sparkContext.parallelize(List(1,2,3,4,5))
+    val rddT = sparkContext.parallelize(List(4,5,6,7,8))
+    val unionRdd = rdd.union(rddT)
+    unionRdd.foreach(println)
+    result: 1 2 3 4 5 4 5 6 7 8
+
+2.join 对两个RDD进行内连接
+    val rdd = sparkContext.parallelize(List((1,2),(2,3),(3,4)))
+    val rddT = sparkContext.parallelize(List((2,5),(3,5),(4,6)))
+    val joinRdd = rdd.join(rddT)
+    joinRdd.foreach(println)
+    result: (3,(4,5))
+            (2,(3,5))
+
+3.leftOuterJoin 对两个RDD进行连接操作，左外连接
+    val rdd = sparkContext.parallelize(List((1,2),(2,3),(3,4)))
+    val rddT = sparkContext.parallelize(List((2,5),(3,5),(3,6),(4,6)))
+    val leftOuterRdd = rdd.leftOuterJoin(rddT)
+    leftOuterRdd.foreach(println)
+    result: (1,(2,None))
+            (3,(4,Some(5)))
+            (3,(4,Some(6)))
+            (2,(3,Some(5)))
+
+4.rightOuterJoin 对两个RDD进行连接操作，右外连接
+    val rdd = sparkContext.parallelize(List((1,2),(2,3),(3,4)))
+    val rddT = sparkContext.parallelize(List((2,5),(3,5),(3,6),(4,6)))
+    val rightOuterRdd = rdd.rightOuterJoin(rddT)
+    rightOuterRdd.foreach(println)
+    result: (4,(None,6))
+            (3,(Some(4),5))
+            (3,(Some(4),6))
+            (2,(Some(3),5))
+
+5.cogroup 将两个RDD中拥有相同键的数据分组
+    val rdd = sparkContext.parallelize(List((1,2),(2,3),(3,4)))
+    val rddT = sparkContext.parallelize(List((2,5),(3,5),(3,6),(4,6)))
+    val cogroup = rdd.cogroup(rddT)
+    cogroup.foreach(println)
+    result: (4,(CompactBuffer(),CompactBuffer(6)))
+            (1,(CompactBuffer(2),CompactBuffer()))
+            (3,(CompactBuffer(4),CompactBuffer(5, 6)))
+            (2,(CompactBuffer(3),CompactBuffer(5)))

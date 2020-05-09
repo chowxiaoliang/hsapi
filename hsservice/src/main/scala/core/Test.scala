@@ -1,6 +1,5 @@
 package core
 
-import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**
@@ -9,12 +8,16 @@ import org.apache.spark.{SparkConf, SparkContext}
 object Test {
 
   def main(args: Array[String]): Unit = {
-    print("hello world!")
-
-    val sparkConf = new SparkConf();
-
+    val sparkConf = new SparkConf()
+    sparkConf.setAppName("Test")
+    sparkConf.setMaster("local[1]")
     val sparkContext = new SparkContext(sparkConf)
-    val rdd = sparkContext.parallelize(List("1"), 3)
-  }
+//    val rdd = sparkContext.parallelize(List(1,2,3,4,5))
+//    val rddT = sparkContext.parallelize(List(4,5,6,7,8))
 
+    val rdd = sparkContext.parallelize(List((1,2),(2,3),(3,4)))
+    val rddT = sparkContext.parallelize(List((2,5),(3,5),(3,6),(4,6)))
+    val cogroup = rdd.cogroup(rddT)
+    cogroup.foreach(println)
+  }
 }
