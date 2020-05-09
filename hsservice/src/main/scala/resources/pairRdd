@@ -112,7 +112,7 @@ transformations
     假设：rdd={(1,2),(3,4),(3,6)} other={(3,9)}
 
     函数名	            目的	                                示例	                    结果
-    substractByKey	    删掉RDD中键与other RDD中的键相同的元素	rdd.subtractByKey(other)	{（1,2）}
+    subtractByKey	    删掉RDD中键与other RDD中的键相同的元素	rdd.subtractByKey(other)	{（1,2）}
     join	            对两个RDD进行内连接	                    rdd.join(other)	            {(3,(4,9)),(3,(6,9))}
     rightOuterJoin	    对两个RDD进行连接操作，右外连接	        rdd.rightOuterJoin(other)	{(3,(4,9)),(3,(6,9))}
     leftOuterJoin	    对两个RDD进行连接操作，左外连接	        rdd.rightOuterJoin(other)	{(1,(2,None)),(3,(4,9)),(3,(6,9))}
