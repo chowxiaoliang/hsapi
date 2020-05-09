@@ -9,13 +9,22 @@ object ProvinceAndAd {
     sparkConf.setAppName("TwoPairRddT")
     val sparkContext = new SparkContext(sparkConf)
     /**
-     * 时间戳，省份，城市，用户，广告。中间使用空格分隔
+     * 省份，城市，用户，广告。中间使用空格分隔
+     * 6 7 64 16
+     * 9 4 75 18
+     * 1 7 87 12
+     * 1 7 87 15
+     * 1 7 87 12
+     * 1 7 87 15
+     * 1 7 87 16
+     * 1 7 87 16
+     * 1 7 87 16
+     * 1 7 87 16
+     * 1 7 87 17
+     * 5 7 87 14
      *
-     * 1516609143867 6 7 64 16
-     * 1516609143869 9 4 75 18
-     * 1516609143869 1 7 87 12
-     */
-    /**
+     * 结果：(1,List((12,2), (15,1)))
+     *
      * 需求：统计每一个省份点击TOP3的广告ID 省份+广告
      */
     //2.读取数据生成 RDD： TS， Province， City， User， AD
@@ -31,6 +40,12 @@ object ProvinceAndAd {
     val provinceToAdSum = provinceAdToSum.map(x => (x._1._1, (x._1._2, x._2)))
     //6.将同一个省份的所有广告进行聚合(Province,List((AD1,sum1),(AD2,sum2)...))
     val provinceGroup = provinceToAdSum.groupByKey()
+    println("========聚合后的结果是=======")
+    provinceGroup.foreach(println)
+    println("============mapValues后的结果一是=================")
+    provinceGroup.mapValues(_.toList).foreach(println)
+    println("============mapValues后的结果二是=================")
+    provinceGroup.mapValues(_.toArray).foreach(println)
     //7.对同一个省份所有广告的集合进行排序并取前 3 条，排序规则为广告点击总数
     val provinceAdTop3 = provinceGroup.mapValues { x =>
       x.toList.sortWith((x, y) => x._2 > y._2).take(3)
