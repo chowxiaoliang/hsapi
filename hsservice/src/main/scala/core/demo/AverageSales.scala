@@ -14,6 +14,14 @@ object AverageSales {
     sparkConf.setAppName("AverageSales")
     val sparkContext = new SparkContext(sparkConf)
 
+    val rdd = sparkContext.parallelize(List(("spark",2),("hadoop",6),("hadoop",4),("spark",6)))
+//    val mapRdd = rdd.map(x => (x._1,(x._2,1)))
+//    val groupRdd = mapRdd.groupByKey().mapValues(v => {
+//      var values = 0;var days = 0;v.foreach(x => {values = values + x._1;days = days + x._2});values/days})
+//    groupRdd.foreach(println)
+
+    rdd.mapValues(x => (x,1)).reduceByKey((x,y)=> (x._1+y._1,x._2+y._2)).mapValues(x => x._1/x._2).foreach(println)
+
   }
 
 }
