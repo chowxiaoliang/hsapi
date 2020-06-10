@@ -48,14 +48,14 @@ public interface CoreOperationService {
      * 获取所有数据
      * @param tableName
      */
-    void getAllRows(String tableName);
+    void getAllRows(String tableName) throws IOException;
 
     /**
      * 根据行键获取一行数据
      * @param tableName
      * @param rowKey
      */
-    void getRow(String tableName, String rowKey);
+    void getRow(String tableName, String rowKey) throws IOException;
 
     /**
      * 根据某一行指定的（列族：列 ）获取数据
@@ -64,5 +64,5 @@ public interface CoreOperationService {
      * @param columnFamily
      * @param qualifier
      */
-    void getRowQualifier(String tableName, String rowKey, String columnFamily, String qualifier);
+    void getRowQualifier(String tableName, String rowKey, String columnFamily, String qualifier) throws IOException;
 }

@@ -2,10 +2,7 @@ package hbase;
 
 import com.google.inject.internal.cglib.core.$Constants;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.HColumnDescriptor;
-import org.apache.hadoop.hbase.HTableDescriptor;
-import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
 
@@ -80,17 +77,54 @@ public class CoreOperationServiceImpl implements CoreOperationService {
     }
 
     @Override
-    public void getAllRows(String tableName) {
-
+    public void getAllRows(String tableName) throws IOException {
+        Connection connection = ConnectionFactory.createConnection(configuration);
+        Table hTable = connection.getTable(TableName.valueOf(tableName));
+        Scan scan = new Scan();
+        ResultScanner resultScanner = hTable.getScanner(scan);
+        for(Result result : resultScanner){
+            Cell[] cells = result.rawCells();
+            for(Cell cell : cells){
+                //得到rowkey
+                System.out.println("行键:" + Bytes.toString(CellUtil.cloneRow(cell)));
+                //得到列族
+                System.out.println("列族" + Bytes.toString(CellUtil.cloneFamily(cell)));
+                System.out.println("列:" + Bytes.toString(CellUtil.cloneQualifier(cell)));
+                System.out.println("值:" + Bytes.toString(CellUtil.cloneValue(cell)));
+            }
+        }
     }
 
     @Override
-    public void getRow(String tableName, String rowKey) {
-
+    public void getRow(String tableName, String rowKey) throws IOException {
+        Connection connection = ConnectionFactory.createConnection(configuration);
+        Table hTable = connection.getTable(TableName.valueOf(tableName));
+        Get get = new Get(Bytes.toBytes(rowKey));
+        // get.setMaxVersions();显示所有版本
+        // get.setTimeStamp();显示指定时间戳的版本
+        Result result = hTable.get(get);
+        for(Cell cell : result.rawCells()){
+            System.out.println("行键:" + Bytes.toString(result.getRow()));
+            System.out.println("列族" + Bytes.toString(CellUtil.cloneFamily(cell)));
+            System.out.println("列:" + Bytes.toString(CellUtil.cloneQualifier(cell)));
+            System.out.println("值:" + Bytes.toString(CellUtil.cloneValue(cell)));
+            System.out.println("时间戳:" + cell.getTimestamp());
+        }
     }
 
     @Override
-    public void getRowQualifier(String tableName, String rowKey, String columnFamily, String qualifier) {
-
+    public void getRowQualifier(String tableName, String rowKey, String columnFamily, String qualifier) throws IOException {
+        Connection connection = ConnectionFactory.createConnection(configuration);
+        Table hTable = connection.getTable(TableName.valueOf(tableName));
+        Get get = new Get(Bytes.toBytes(rowKey));
+        get.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes(qualifier));
+        Result result = hTable.get(get);
+        for(Cell cell : result.rawCells()){
+            System.out.println("行键:" + Bytes.toString(result.getRow()));
+            System.out.println("列族" + Bytes.toString(CellUtil.cloneFamily(cell)));
+            System.out.println("列:" + Bytes.toString(CellUtil.cloneQualifier(cell)));
+            System.out.println("值:" + Bytes.toString(CellUtil.cloneValue(cell)));
+            System.out.println("时间戳:" + cell.getTimestamp());
+        }
     }
 }
