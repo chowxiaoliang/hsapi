@@ -1,5 +1,7 @@
 package hbase;
 
+import java.io.IOException;
+
 /**
  * @desc hbase 一些核心操作api
  */
@@ -10,20 +12,20 @@ public interface CoreOperationService {
      * @param tableName
      * @return
      */
-    boolean isTableExist(String tableName);
+    boolean isTableExist(String tableName) throws IOException;
 
     /**
      * 创建表
      * @param tableName
      * @param columnFamily
      */
-    void createTable(String tableName, String... columnFamily);
+    void createTable(String tableName, String... columnFamily) throws IOException;
 
     /**
      * 删除表
      * @param tableName
      */
-    void dropTable(String tableName);
+    void dropTable(String tableName) throws IOException;
 
     /**
      * 向表中插入数据
@@ -33,14 +35,14 @@ public interface CoreOperationService {
      * @param column
      * @param value
      */
-    void addRowData(String tableName, String rowKey, String columnFamily, String column, String value);
+    void addRowData(String tableName, String rowKey, String columnFamily, String column, String value) throws IOException;
 
     /**
      * 删除多行数据
      * @param tableName
      * @param rows
      */
-    void deleteMultiRow(String tableName, String... rows);
+    void deleteMultiRow(String tableName, String... rows) throws IOException;
 
     /**
      * 获取所有数据
