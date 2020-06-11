@@ -1,5 +1,16 @@
 1.deviceFingerprint
+
 2.eventHistory
+
+8.actionHistory
+
+
+
+10.dailyRiskReport
+
+11.dailyStrategyReport
+
+
 
 3.blackList
 
@@ -11,10 +22,4 @@
 
 7.multiPlatformLoan
 
-8.actionHistory
-
 9.starNetRelation
-
-10.dailyRiskReport
-
-11.dailyStrategyReport

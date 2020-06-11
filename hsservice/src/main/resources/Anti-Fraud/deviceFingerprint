@@ -1,0 +1,26 @@
+deviceFingerprint relation fields:
+
+    private String mid; // (String) 设备唯一标识
+    private String uid; // (String) 用户uid
+    private String versionCode;  // (String) versionCode，程序版本号
+    private String versionName;  // (String) versionName，程序版本名
+    private String language;   // (String) 系统语言
+    private String sourceIdentifier;  // (String) 渠道号，应用从哪个渠道来的。
+    private String os;  // (String) Android系统版本
+    private String area;  // (String) 区域
+    private String md;  // (String) 手机型号
+    private String branch;  // (String) 手机品牌
+    private String sdkVersion;  // (String) sdkVersion
+    private String gmail;   // (String) gmail
+    private String heightXwidth;  // (String) heightXwidth，屏幕宽高
+    private String time;   // (String) 客户端日志产生时的时间
+    private String network;  // (String) 网络模式
+    private String longitude;  // (double) lng经度
+    private String latitude;  // (double) lat 纬度
+
+存：
+hbase hdfs mysql
+
+取：
+hiveSql sparkSql
+
