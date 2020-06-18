@@ -16,6 +16,12 @@ public class DataUtils {
 
     private final static Random RANDOM_PHONE_MARKER = new Random();
 
+    private final static Random RANDOM_OS = new Random();
+
+    private final static Random RANDOM_BANK = new Random();
+
+    private final static Random RANDOM_PAY_METHOD = new Random();
+
     private final static LocationUtil LOCATION_UTIL = LocationUtil.getInstance();
 
     private final static SnowFlake SNOW_FLAKE_RISKFLOW_NO = new SnowFlake(1, 1);
@@ -186,7 +192,20 @@ public class DataUtils {
         return phoneMarker[RANDOM_PHONE_MARKER.nextInt(phoneMarker.length)];
     }
 
-    public static String
+    public static String getOs(){
+        String[] os = {"Android, IOs"};
+        return os[RANDOM_OS.nextInt(os.length)];
+    }
+
+    public static String getBankName(){
+        String[] bank = {"招商银行", "华夏银行", "农业银行", "兴业银行", "工商银行", "邮政储蓄", "建设银行", "中国银行"};
+        return bank[RANDOM_BANK.nextInt(bank.length)];
+    }
+
+    public static String getPayMethod(){
+        String[] payMethod = {"支付宝", "微信", "银行卡"};
+        return payMethod[RANDOM_PAY_METHOD.nextInt(payMethod.length)];
+    }
 
     public static void main(String[] args) {
         for (int i=0;i<100;i++){

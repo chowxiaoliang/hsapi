@@ -55,12 +55,8 @@ public class RiskEvent implements Serializable {
     private String deliverZipCode;
     /**收货人手机号*/
     private String deliverMobileNo;
-    /**收货人座机号*/
-    private String deliverPhone;
     /**收货人姓名*/
     private String deliverName;
-    /**银行卡类型*/
-    private String bankCardType;
     /**银行名称*/
     private String bankName;
     /**银行卡号*/
@@ -77,8 +73,6 @@ public class RiskEvent implements Serializable {
     private String payeeEmail;
     /**卖家或收款人手机*/
     private String payeeMobile;
-    /**卖家或收款人座机*/
-    private String payeePhone;
     /**卖家或收款人身份证*/
     private String payeeIdNumber;
     /**卖家或收款人银行卡号*/
@@ -88,4 +82,243 @@ public class RiskEvent implements Serializable {
     /**支付方式*/
     private String payMethod;
 
+    public String getPartnerId() {
+        return partnerId;
+    }
+
+    public void setPartnerId(String partnerId) {
+        this.partnerId = partnerId;
+    }
+
+    public String getRiskFlowNo() {
+        return riskFlowNo;
+    }
+
+    public void setRiskFlowNo(String riskFlowNo) {
+        this.riskFlowNo = riskFlowNo;
+    }
+
+    public String getCertNo() {
+        return certNo;
+    }
+
+    public void setCertNo(String certNo) {
+        this.certNo = certNo;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public String getBankCard() {
+        return bankCard;
+    }
+
+    public void setBankCard(String bankCard) {
+        this.bankCard = bankCard;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getMac() {
+        return mac;
+    }
+
+    public void setMac(String mac) {
+        this.mac = mac;
+    }
+
+    public String getImei() {
+        return imei;
+    }
+
+    public void setImei(String imei) {
+        this.imei = imei;
+    }
+
+    public String getPhoneOperator() {
+        return phoneOperator;
+    }
+
+    public void setPhoneOperator(String phoneOperator) {
+        this.phoneOperator = phoneOperator;
+    }
+
+    public String getPhoneMarker() {
+        return phoneMarker;
+    }
+
+    public void setPhoneMarker(String phoneMarker) {
+        this.phoneMarker = phoneMarker;
+    }
+
+    public String getOs() {
+        return os;
+    }
+
+    public void setOs(String os) {
+        this.os = os;
+    }
+
+    public String getDeliverAddressCountry() {
+        return deliverAddressCountry;
+    }
+
+    public void setDeliverAddressCountry(String deliverAddressCountry) {
+        this.deliverAddressCountry = deliverAddressCountry;
+    }
+
+    public String getDeliverAddressProvince() {
+        return deliverAddressProvince;
+    }
+
+    public void setDeliverAddressProvince(String deliverAddressProvince) {
+        this.deliverAddressProvince = deliverAddressProvince;
+    }
+
+    public String getDeliverAddressCity() {
+        return deliverAddressCity;
+    }
+
+    public void setDeliverAddressCity(String deliverAddressCity) {
+        this.deliverAddressCity = deliverAddressCity;
+    }
+
+    public String getDeliverZipCode() {
+        return deliverZipCode;
+    }
+
+    public void setDeliverZipCode(String deliverZipCode) {
+        this.deliverZipCode = deliverZipCode;
+    }
+
+    public String getDeliverMobileNo() {
+        return deliverMobileNo;
+    }
+
+    public void setDeliverMobileNo(String deliverMobileNo) {
+        this.deliverMobileNo = deliverMobileNo;
+    }
+
+    public String getDeliverName() {
+        return deliverName;
+    }
+
+    public void setDeliverName(String deliverName) {
+        this.deliverName = deliverName;
+    }
+
+    public String getBankName() {
+        return bankName;
+    }
+
+    public void setBankName(String bankName) {
+        this.bankName = bankName;
+    }
+
+    public String getBankCardNo() {
+        return bankCardNo;
+    }
+
+    public void setBankCardNo(String bankCardNo) {
+        this.bankCardNo = bankCardNo;
+    }
+
+    public String getOrigOrderId() {
+        return origOrderId;
+    }
+
+    public void setOrigOrderId(String origOrderId) {
+        this.origOrderId = origOrderId;
+    }
+
+    public String getPayeeName() {
+        return payeeName;
+    }
+
+    public void setPayeeName(String payeeName) {
+        this.payeeName = payeeName;
+    }
+
+    public String getPayeeEmail() {
+        return payeeEmail;
+    }
+
+    public void setPayeeEmail(String payeeEmail) {
+        this.payeeEmail = payeeEmail;
+    }
+
+    public String getPayeeMobile() {
+        return payeeMobile;
+    }
+
+    public void setPayeeMobile(String payeeMobile) {
+        this.payeeMobile = payeeMobile;
+    }
+
+    public String getPayeeIdNumber() {
+        return payeeIdNumber;
+    }
+
+    public void setPayeeIdNumber(String payeeIdNumber) {
+        this.payeeIdNumber = payeeIdNumber;
+    }
+
+    public String getPayeeCardNumber() {
+        return payeeCardNumber;
+    }
+
+    public void setPayeeCardNumber(String payeeCardNumber) {
+        this.payeeCardNumber = payeeCardNumber;
+    }
+
+    public String getPayId() {
+        return payId;
+    }
+
+    public void setPayId(String payId) {
+        this.payId = payId;
+    }
+
+    public String getPayMethod() {
+        return payMethod;
+    }
+
+    public void setPayMethod(String payMethod) {
+        this.payMethod = payMethod;
+    }
 }
