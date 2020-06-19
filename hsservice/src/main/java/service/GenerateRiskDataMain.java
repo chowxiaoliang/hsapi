@@ -2,7 +2,6 @@ package service;
 
 import bean.RiskEvent;
 import com.alibaba.fastjson.JSONObject;
-import com.google.inject.internal.asm.$MethodAdapter;
 import service.risk.DataUtils;
 import service.risk.GenerateName;
 
@@ -10,8 +9,8 @@ import java.util.UUID;
 
 public class GenerateRiskDataMain {
 
-    /**十万条记录*/
-    private final static int TIME = 1000000000;
+    /**十亿条记录*/
+    private final static int TIME = 1000000;
 
     private final static String COUNTRY = "中国";
 

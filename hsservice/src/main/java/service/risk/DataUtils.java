@@ -193,7 +193,7 @@ public class DataUtils {
     }
 
     public static String getOs(){
-        String[] os = {"Android, IOs"};
+        String[] os = {"Android, iOS"};
         return os[RANDOM_OS.nextInt(os.length)];
     }
 
