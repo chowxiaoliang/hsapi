@@ -45,7 +45,7 @@ public class GenerateRiskDataMain {
             riskEvent.setPayeeMobile(DataUtils.getMobile());
             riskEvent.setPayeeCardNumber(DataUtils.getBankCardNo());
             riskEvent.setPayeeIdNumber(DataUtils.getCertNo());
-            riskEvent.setPayId(UUID.randomUUID().toString());
+            riskEvent.setPayId(UUID.randomUUID().toString().replace("-", ""));
             riskEvent.setPayMethod(DataUtils.getPayMethod());
             System.out.println(JSONObject.toJSONString(riskEvent));
         }

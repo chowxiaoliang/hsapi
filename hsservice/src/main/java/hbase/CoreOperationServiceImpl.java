@@ -1,38 +1,49 @@
 package hbase;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.inject.internal.cglib.core.$Constants;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.hbase.util.CollectionUtils;
+import org.apache.hadoop.hbase.util.MD5Hash;
+import org.apache.hadoop.yarn.webapp.hamlet.HamletSpec;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @desc 一些核心操作api的具体实现
  */
 public class CoreOperationServiceImpl implements CoreOperationService {
 
-    private static Configuration configuration;
+    private static Connection CONNECTION = null;
+
     static {
-        HBaseConfiguration.create();
-        configuration.set("hbase.zookeeper.quorum", "hadoop001");
-        configuration.set("hbase.zookeeper.property.clientPort", "2181");
+        try {
+            Configuration configuration = HBaseConfiguration.create();
+            configuration.set("hbase.zookeeper.quorum", "hadoop001");
+            configuration.set("hbase.zookeeper.property.clientPort", "2181");
+            CONNECTION = ConnectionFactory.createConnection(configuration);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
     public boolean isTableExist(String tableName) throws IOException {
-        Connection connection = ConnectionFactory.createConnection(configuration);
-        HBaseAdmin hBaseAdmin = (HBaseAdmin)connection.getAdmin();
+        HBaseAdmin hBaseAdmin = (HBaseAdmin)CONNECTION.getAdmin();
         return hBaseAdmin.tableExists(tableName);
     }
 
     @Override
     public void createTable(String tableName, String... columnFamily) throws IOException {
-        Connection connection = ConnectionFactory.createConnection(configuration);
-        HBaseAdmin hBaseAdmin = (HBaseAdmin)connection.getAdmin();
+        HBaseAdmin hBaseAdmin = (HBaseAdmin)CONNECTION.getAdmin();
         if(isTableExist(tableName)){
             return;
         }
@@ -45,8 +56,7 @@ public class CoreOperationServiceImpl implements CoreOperationService {
 
     @Override
     public void dropTable(String tableName) throws IOException {
-        Connection connection = ConnectionFactory.createConnection(configuration);
-        HBaseAdmin hBaseAdmin = (HBaseAdmin)connection.getAdmin();
+        HBaseAdmin hBaseAdmin = (HBaseAdmin)CONNECTION.getAdmin();
         if(!isTableExist(tableName)){
             hBaseAdmin.disableTable(tableName);
             hBaseAdmin.deleteTable(tableName);
@@ -55,8 +65,7 @@ public class CoreOperationServiceImpl implements CoreOperationService {
 
     @Override
     public void addRowData(String tableName, String rowKey, String columnFamily, String column, String value) throws IOException {
-        Connection connection = ConnectionFactory.createConnection(configuration);
-        Table hTable = connection.getTable(TableName.valueOf(tableName));
+        Table hTable = CONNECTION.getTable(TableName.valueOf(tableName));
         Put put = new Put(Bytes.toBytes(rowKey));
         put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes(column), Bytes.toBytes(value));
         hTable.put(put);
@@ -64,9 +73,24 @@ public class CoreOperationServiceImpl implements CoreOperationService {
     }
 
     @Override
+    public void addBatchRowData(String tableName, String rowKey, Map<String, String> columnMap) throws IOException {
+        Table table = CONNECTION.getTable(TableName.valueOf(tableName));
+        // key使用md5加密
+        String md5Key = md5HashRowKey(rowKey);
+        Put put = new Put(md5Key.getBytes());
+        for(String entry : columnMap.keySet()){
+            String jsonData = columnMap.get(entry);
+            JSONObject jsonObject = JSONObject.parseObject(jsonData);
+            for(String innerEntry : jsonObject.keySet()){
+                put.addColumn(entry.getBytes(), innerEntry.getBytes(), jsonObject.getString(innerEntry).getBytes());
+            }
+        }
+        table.put(put);
+    }
+
+    @Override
     public void deleteMultiRow(String tableName, String... rows) throws IOException {
-        Connection connection = ConnectionFactory.createConnection(configuration);
-        Table table = connection.getTable(TableName.valueOf(tableName));
+        Table table = CONNECTION.getTable(TableName.valueOf(tableName));
         List<Delete> deleteList = new ArrayList<>();
         for(String row : rows){
             Delete delete = new Delete(Bytes.toBytes(row));
@@ -78,8 +102,7 @@ public class CoreOperationServiceImpl implements CoreOperationService {
 
     @Override
     public void getAllRows(String tableName) throws IOException {
-        Connection connection = ConnectionFactory.createConnection(configuration);
-        Table hTable = connection.getTable(TableName.valueOf(tableName));
+        Table hTable = CONNECTION.getTable(TableName.valueOf(tableName));
         Scan scan = new Scan();
         ResultScanner resultScanner = hTable.getScanner(scan);
         for(Result result : resultScanner){
@@ -97,8 +120,7 @@ public class CoreOperationServiceImpl implements CoreOperationService {
 
     @Override
     public void getRow(String tableName, String rowKey) throws IOException {
-        Connection connection = ConnectionFactory.createConnection(configuration);
-        Table hTable = connection.getTable(TableName.valueOf(tableName));
+        Table hTable = CONNECTION.getTable(TableName.valueOf(tableName));
         Get get = new Get(Bytes.toBytes(rowKey));
         // get.setMaxVersions();显示所有版本
         // get.setTimeStamp();显示指定时间戳的版本
@@ -114,8 +136,7 @@ public class CoreOperationServiceImpl implements CoreOperationService {
 
     @Override
     public void getRowQualifier(String tableName, String rowKey, String columnFamily, String qualifier) throws IOException {
-        Connection connection = ConnectionFactory.createConnection(configuration);
-        Table hTable = connection.getTable(TableName.valueOf(tableName));
+        Table hTable = CONNECTION.getTable(TableName.valueOf(tableName));
         Get get = new Get(Bytes.toBytes(rowKey));
         get.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes(qualifier));
         Result result = hTable.get(get);
@@ -127,4 +148,12 @@ public class CoreOperationServiceImpl implements CoreOperationService {
             System.out.println("时间戳:" + cell.getTimestamp());
         }
     }
+
+    /**
+     * 取key值的MD5前8位再拼接key值
+     */
+    private String md5HashRowKey(String key){
+        return MD5Hash.getMD5AsHex(key.getBytes()).substring(0, 8) + key;
+    }
+
 }
