@@ -1,16 +1,11 @@
 package hbase;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.google.inject.internal.cglib.core.$Constants;
-import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hbase.util.CollectionUtils;
 import org.apache.hadoop.hbase.util.MD5Hash;
-import org.apache.hadoop.yarn.webapp.hamlet.HamletSpec;
 
 import java.io.IOException;
 import java.util.ArrayList;
