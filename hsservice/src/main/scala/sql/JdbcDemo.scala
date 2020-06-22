@@ -18,21 +18,12 @@ object JdbcDemo {
 
     mysqlDataFrame.createOrReplaceTempView("t_rule")
     val selectDataFrame = sparkSession.sql("select rule_content from t_rule where id = 12")
+    selectDataFrame.foreach(x => {
+      println(x)
+    })
     selectDataFrame.describe().show()
 
     sparkSession.stop()
-
-    def catalog = s"""{
-                     |"table":{"namespace":"default", "name":"Contacts"},
-                     |"rowkey":"key",
-                     |"columns":{
-                     |"rowkey":{"cf":"rowkey", "col":"key", "type":"string"},
-                     |"officeAddress":{"cf":"Office", "col":"Address", "type":"string"},
-                     |"officePhone":{"cf":"Office", "col":"Phone", "type":"string"},
-                     |"personalName":{"cf":"Personal", "col":"Name", "type":"string"},
-                     |"personalPhone":{"cf":"Personal", "col":"Phone", "type":"string"}
-                     |}
-                     |}""".stripMargin
   }
 
 }

@@ -29,8 +29,12 @@ object FirstDemo {
     peopleDFf.show()
 
     peopleDFf.createOrReplaceTempView("t_people")
-    sparkSession.sql("select count(*) from t_people").show()
-    sparkSession.sql("select * from t_people where age > 24").show()
+    sparkSession.sql("select * from t_people").show()
+    val result = sparkSession.sql("select * from t_people")
+//    result.foreach(x => {
+//      println(x.getString(1))
+//    })
+    result.take(2).foreach(x => println(x))
     sparkSession.stop()
 
   }
