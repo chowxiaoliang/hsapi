@@ -1,6 +1,7 @@
 package bean;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * riskEvent bean
@@ -29,6 +30,10 @@ public class RiskEvent implements Serializable {
     private String province;
     /**城市*/
     private String city;
+    /**事件发生时间*/
+    private long occurTimeLong;
+    private String occurTimeStr;
+    private Date occurTimeDate;
 
     // deviceInfo
 
@@ -124,6 +129,30 @@ public class RiskEvent implements Serializable {
 
     public String getBankCard() {
         return bankCard;
+    }
+
+    public long getOccurTimeLong() {
+        return occurTimeLong;
+    }
+
+    public void setOccurTimeLong(long occurTimeLong) {
+        this.occurTimeLong = occurTimeLong;
+    }
+
+    public String getOccurTimeStr() {
+        return occurTimeStr;
+    }
+
+    public void setOccurTimeStr(String occurTimeStr) {
+        this.occurTimeStr = occurTimeStr;
+    }
+
+    public Date getOccurTimeDate() {
+        return occurTimeDate;
+    }
+
+    public void setOccurTimeDate(Date occurTimeDate) {
+        this.occurTimeDate = occurTimeDate;
     }
 
     public void setBankCard(String bankCard) {

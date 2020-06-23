@@ -7,6 +7,8 @@ import service.kafka.MyKafkaProducer;
 import service.risk.DataUtils;
 import service.risk.GenerateName;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 public class GenerateRiskDataMain {
@@ -15,6 +17,8 @@ public class GenerateRiskDataMain {
     private final static int TIME = 5;
 
     private final static String COUNTRY = "中国";
+
+    private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("YYYY-MM-dd hh-mm-ss");
 
     public static void main(String[] args) {
         new Thread(() -> {
@@ -29,6 +33,9 @@ public class GenerateRiskDataMain {
                 riskEvent.setCountry(COUNTRY);
                 riskEvent.setProvince(DataUtils.getProvince());
                 riskEvent.setCity(DataUtils.getCity(riskEvent.getProvince()));
+                riskEvent.setOccurTimeLong(System.currentTimeMillis());
+                riskEvent.setOccurTimeStr(SIMPLE_DATE_FORMAT.format(new Date()));
+                riskEvent.setOccurTimeDate(new Date());
                 riskEvent.setMac(DataUtils.getMac());
                 riskEvent.setImei(DataUtils.getImei());
                 riskEvent.setPhoneOperator(DataUtils.getOperator());
