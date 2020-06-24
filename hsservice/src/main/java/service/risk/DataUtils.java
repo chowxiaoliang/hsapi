@@ -22,6 +22,8 @@ public class DataUtils {
 
     private final static Random RANDOM_PAY_METHOD = new Random();
 
+    private final static Random RANDOM_EVENT_TYPE = new Random();
+
     private final static LocationUtil LOCATION_UTIL = LocationUtil.getInstance();
 
     private final static SnowFlake SNOW_FLAKE_RISKFLOW_NO = new SnowFlake(1, 1);
@@ -158,6 +160,11 @@ public class DataUtils {
         String separatorOfMac = ":";
         String[] mac = {String.format("%02x", 0x52), String.format("%02x", 0x54), String.format("%02x", 0x00), String.format("%02x", RANDOM_MAC.nextInt(0xff)), String.format("%02x", RANDOM_MAC.nextInt(0xff)), String.format("%02x", RANDOM_MAC.nextInt(0xff))};
         return String.join(separatorOfMac, mac);
+    }
+
+    public static String getEventType(){
+        String[] eventType = {"register, login, loan, pay, transfer, lend"};
+        return eventType[RANDOM_EVENT_TYPE.nextInt(eventType.length)];
     }
 
     public static String getImei(){

@@ -16,6 +16,8 @@ public class RiskEvent implements Serializable {
     private String partnerId;
     /**风控流水号*/
     private String riskFlowNo;
+    /**事件类型*/
+    private String eventType;
     /**身份证号*/
     private String certNo;
     /**姓名*/
@@ -101,6 +103,14 @@ public class RiskEvent implements Serializable {
 
     public void setRiskFlowNo(String riskFlowNo) {
         this.riskFlowNo = riskFlowNo;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
     }
 
     public String getCertNo() {

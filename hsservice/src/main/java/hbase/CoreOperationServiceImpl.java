@@ -75,6 +75,7 @@ public class CoreOperationServiceImpl implements CoreOperationService {
         Put put = new Put(md5Key.getBytes());
         put.addColumn(Bytes.toBytes("BASE_INFO"), Bytes.toBytes("PARTNER_ID"), Bytes.toBytes(jsonObject.getString("partnerId")));
         put.addColumn(Bytes.toBytes("BASE_INFO"), Bytes.toBytes("RISK_FLOW_NO"), Bytes.toBytes(jsonObject.getString("riskFlowNo")));
+        put.addColumn(Bytes.toBytes("BASE_INFO"), Bytes.toBytes("EVENT_TYPE"), Bytes.toBytes(jsonObject.getString("eventType")));
         put.addColumn(Bytes.toBytes("BASE_INFO"), Bytes.toBytes("CERT_NO"), Bytes.toBytes(jsonObject.getString("certNo")));
         put.addColumn(Bytes.toBytes("BASE_INFO"), Bytes.toBytes("NAME"), Bytes.toBytes(jsonObject.getString("name")));
         put.addColumn(Bytes.toBytes("BASE_INFO"), Bytes.toBytes("MOBILE"), Bytes.toBytes(jsonObject.getString("mobile")));

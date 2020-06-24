@@ -27,6 +27,7 @@ public class GenerateRiskDataMain {
                 RiskEvent riskEvent = new RiskEvent();
                 riskEvent.setPartnerId(DataUtils.getPartnerId());
                 riskEvent.setRiskFlowNo(DataUtils.getRiskFlowNo());
+                riskEvent.setEventType(DataUtils.getEventType());
                 riskEvent.setCertNo(DataUtils.getCertNo());
                 riskEvent.setName(GenerateName.getName());
                 riskEvent.setMobile(DataUtils.getMobile());
