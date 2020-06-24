@@ -92,7 +92,7 @@ public class MyKafkaConsumer {
                 riskEventDeliverInfo.setBankName(jsonObject.getString("bankName"));
                 riskEventDeliverInfo.setBankCardNo(jsonObject.getString("bankCardNo"));
                 riskEventDeliverInfo.setOrigOrderId(jsonObject.getString("origOrderId"));
-                resultMap.put("deliveryInfo", JSONObject.toJSONString(riskEventDeliverInfo));
+                resultMap.put("deliverInfo", JSONObject.toJSONString(riskEventDeliverInfo));
 
                 // sellerInfo
                 RiskEvent riskEventSellerInfo = new RiskEvent();

@@ -48,7 +48,7 @@ public class RiskEvent implements Serializable {
     /**操作系统类型*/
     private String os;
 
-    // deliveryInfo
+    // deliverInfo
 
     /**收货国家*/
     private String deliverAddressCountry;
