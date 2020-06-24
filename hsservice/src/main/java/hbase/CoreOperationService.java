@@ -1,5 +1,7 @@
 package hbase;
 
+import com.alibaba.fastjson.JSONObject;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -43,9 +45,9 @@ public interface CoreOperationService {
      * 向表中批量插入数据,多个columnFamily的情况，数据为json字符串
      * @param tableName
      * @param rowKey
-     * @param columnMap key 为columnFamily, value为json字符串，里面为column及其对应的值
+     * @param jsonData json数据，直接按对应的key获取数据
      */
-    void addBatchRowData(String tableName, String rowKey, Map<String, String> columnMap) throws IOException;
+    void addBatchRowData(String tableName, String rowKey, JSONObject jsonData) throws IOException;
 
     /**
      * 删除多行数据

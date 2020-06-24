@@ -68,18 +68,43 @@ public class CoreOperationServiceImpl implements CoreOperationService {
     }
 
     @Override
-    public void addBatchRowData(String tableName, String rowKey, Map<String, String> columnMap) throws IOException {
+    public void addBatchRowData(String tableName, String rowKey, JSONObject jsonObject) throws IOException {
         Table table = CONNECTION.getTable(TableName.valueOf(tableName));
-        // key使用md5加密
+        // 取key值的MD5前8位再拼接key值
         String md5Key = md5HashRowKey(rowKey);
         Put put = new Put(md5Key.getBytes());
-        for(String entry : columnMap.keySet()){
-            String jsonData = columnMap.get(entry);
-            JSONObject jsonObject = JSONObject.parseObject(jsonData);
-            for(String innerEntry : jsonObject.keySet()){
-                put.addColumn(Bytes.toBytes(entry), Bytes.toBytes(innerEntry), Bytes.toBytes(innerEntry));
-            }
-        }
+        put.addColumn(Bytes.toBytes("BASE_INFO"), Bytes.toBytes("PARTNER_ID"), Bytes.toBytes(jsonObject.getString("partnerId")));
+        put.addColumn(Bytes.toBytes("BASE_INFO"), Bytes.toBytes("RISK_FLOW_NO"), Bytes.toBytes(jsonObject.getString("riskFlowNo")));
+        put.addColumn(Bytes.toBytes("BASE_INFO"), Bytes.toBytes("CERT_NO"), Bytes.toBytes(jsonObject.getString("certNo")));
+        put.addColumn(Bytes.toBytes("BASE_INFO"), Bytes.toBytes("NAME"), Bytes.toBytes(jsonObject.getString("name")));
+        put.addColumn(Bytes.toBytes("BASE_INFO"), Bytes.toBytes("MOBILE"), Bytes.toBytes(jsonObject.getString("mobile")));
+        put.addColumn(Bytes.toBytes("BASE_INFO"), Bytes.toBytes("BANK_CARD"), Bytes.toBytes(jsonObject.getString("bankCard")));
+        put.addColumn(Bytes.toBytes("BASE_INFO"), Bytes.toBytes("COUNTRY"), Bytes.toBytes(jsonObject.getString("country")));
+        put.addColumn(Bytes.toBytes("BASE_INFO"), Bytes.toBytes("PROVINCE"), Bytes.toBytes(jsonObject.getString("province")));
+        put.addColumn(Bytes.toBytes("BASE_INFO"), Bytes.toBytes("CITY"), Bytes.toBytes(jsonObject.getString("city")));
+        put.addColumn(Bytes.toBytes("BASE_INFO"), Bytes.toBytes("OCCUR_TIME_TO_STR"), Bytes.toBytes(jsonObject.getString("occurTimeDateToStr")));
+        put.addColumn(Bytes.toBytes("BASE_INFO"), Bytes.toBytes("OCCUR_TIME_LONG"), Bytes.toBytes(jsonObject.getLongValue("occurTimeLong")));
+        put.addColumn(Bytes.toBytes("BASE_INFO"), Bytes.toBytes("OCCUR_TIME_STR"), Bytes.toBytes(jsonObject.getString("occurTimeStr")));
+        put.addColumn(Bytes.toBytes("DEVICE_INFO"), Bytes.toBytes("MAC"), Bytes.toBytes(jsonObject.getString("mac")));
+        put.addColumn(Bytes.toBytes("DEVICE_INFO"), Bytes.toBytes("IMEI"), Bytes.toBytes(jsonObject.getString("imei")));
+        put.addColumn(Bytes.toBytes("DEVICE_INFO"), Bytes.toBytes("PHONE_OPERATOR"), Bytes.toBytes(jsonObject.getString("phoneOperator")));
+        put.addColumn(Bytes.toBytes("DEVICE_INFO"), Bytes.toBytes("OS"), Bytes.toBytes(jsonObject.getString("os")));
+        put.addColumn(Bytes.toBytes("DELIVER_INFO"), Bytes.toBytes("DELIVER_ADDRESS_COUNTRY"), Bytes.toBytes(jsonObject.getString("deliverAddressCountry")));
+        put.addColumn(Bytes.toBytes("DELIVER_INFO"), Bytes.toBytes("DELIVER_ADDRESS_PROVINCE"), Bytes.toBytes(jsonObject.getString("deliverAddressProvince")));
+        put.addColumn(Bytes.toBytes("DELIVER_INFO"), Bytes.toBytes("DELIVER_ADDRESS_CITY"), Bytes.toBytes(jsonObject.getString("deliverAddressCity")));
+        put.addColumn(Bytes.toBytes("DELIVER_INFO"), Bytes.toBytes("DELIVER_ZIP_CODE"), Bytes.toBytes(jsonObject.getString("deliverZipCode")));
+        put.addColumn(Bytes.toBytes("DELIVER_INFO"), Bytes.toBytes("DELIVER_MOBILE_NO"), Bytes.toBytes(jsonObject.getString("deliverMobileNo")));
+        put.addColumn(Bytes.toBytes("DELIVER_INFO"), Bytes.toBytes("DELIVER_NAME"), Bytes.toBytes(jsonObject.getString("deliverName")));
+        put.addColumn(Bytes.toBytes("DELIVER_INFO"), Bytes.toBytes("BANK_NAME"), Bytes.toBytes(jsonObject.getString("bankName")));
+        put.addColumn(Bytes.toBytes("DELIVER_INFO"), Bytes.toBytes("BANK_CARD_NO"), Bytes.toBytes(jsonObject.getString("bankCardNo")));
+        put.addColumn(Bytes.toBytes("DELIVER_INFO"), Bytes.toBytes("ORIG_ORDER_ID"), Bytes.toBytes(jsonObject.getString("origOrderId")));
+        put.addColumn(Bytes.toBytes("SELLER_INFO"), Bytes.toBytes("PAYEE_NAME"), Bytes.toBytes(jsonObject.getString("payeeName")));
+        put.addColumn(Bytes.toBytes("SELLER_INFO"), Bytes.toBytes("PAYEE_EMAIL"), Bytes.toBytes(jsonObject.getString("payeeEmail")));
+        put.addColumn(Bytes.toBytes("SELLER_INFO"), Bytes.toBytes("PAYEE_MOBILE"), Bytes.toBytes(jsonObject.getString("payeeMobile")));
+        put.addColumn(Bytes.toBytes("SELLER_INFO"), Bytes.toBytes("PAYEE_ID_NUMBER"), Bytes.toBytes(jsonObject.getString("payeeIdNumber")));
+        put.addColumn(Bytes.toBytes("SELLER_INFO"), Bytes.toBytes("PAYEE_CARD_NUMBER"), Bytes.toBytes(jsonObject.getString("payeeCardNumber")));
+        put.addColumn(Bytes.toBytes("SELLER_INFO"), Bytes.toBytes("PAYEE_ID"), Bytes.toBytes(jsonObject.getString("payId")));
+        put.addColumn(Bytes.toBytes("SELLER_INFO"), Bytes.toBytes("PAYEE_METHOD"), Bytes.toBytes(jsonObject.getString("payMethod")));
         table.put(put);
     }
 
