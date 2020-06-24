@@ -33,7 +33,7 @@ public class RiskEvent implements Serializable {
     /**事件发生时间*/
     private long occurTimeLong;
     private String occurTimeStr;
-    private Date occurTimeDate;
+    private String occurTimeDateToStr;
 
     // deviceInfo
 
@@ -147,12 +147,12 @@ public class RiskEvent implements Serializable {
         this.occurTimeStr = occurTimeStr;
     }
 
-    public Date getOccurTimeDate() {
-        return occurTimeDate;
+    public String getOccurTimeDateToStr() {
+        return occurTimeDateToStr;
     }
 
-    public void setOccurTimeDate(Date occurTimeDate) {
-        this.occurTimeDate = occurTimeDate;
+    public void setOccurTimeDateToStr(String occurTimeDateToStr) {
+        this.occurTimeDateToStr = occurTimeDateToStr;
     }
 
     public void setBankCard(String bankCard) {

@@ -6,6 +6,7 @@ import service.kafka.MyKafkaConsumer;
 import service.kafka.MyKafkaProducer;
 import service.risk.DataUtils;
 import service.risk.GenerateName;
+import service.risk.TimeUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -18,7 +19,7 @@ public class GenerateRiskDataMain {
 
     private final static String COUNTRY = "中国";
 
-    private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("YYYY-MM-dd hh-mm-ss");
+    private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public static void main(String[] args) {
         new Thread(() -> {
@@ -33,9 +34,9 @@ public class GenerateRiskDataMain {
                 riskEvent.setCountry(COUNTRY);
                 riskEvent.setProvince(DataUtils.getProvince());
                 riskEvent.setCity(DataUtils.getCity(riskEvent.getProvince()));
-                riskEvent.setOccurTimeLong(System.currentTimeMillis());
-                riskEvent.setOccurTimeStr(SIMPLE_DATE_FORMAT.format(new Date()));
-                riskEvent.setOccurTimeDate(new Date());
+                riskEvent.setOccurTimeLong(TimeUtils.getTimeLong());
+                riskEvent.setOccurTimeStr(SIMPLE_DATE_FORMAT.format(riskEvent.getOccurTimeLong()));
+                riskEvent.setOccurTimeDateToStr(new Date(riskEvent.getOccurTimeLong()).toString());
                 riskEvent.setMac(DataUtils.getMac());
                 riskEvent.setImei(DataUtils.getImei());
                 riskEvent.setPhoneOperator(DataUtils.getOperator());

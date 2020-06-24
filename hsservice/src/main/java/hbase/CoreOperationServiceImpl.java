@@ -77,7 +77,7 @@ public class CoreOperationServiceImpl implements CoreOperationService {
             String jsonData = columnMap.get(entry);
             JSONObject jsonObject = JSONObject.parseObject(jsonData);
             for(String innerEntry : jsonObject.keySet()){
-                put.addColumn(entry.getBytes(), innerEntry.getBytes(), jsonObject.getString(innerEntry).getBytes());
+                put.addColumn(Bytes.toBytes(entry), Bytes.toBytes(innerEntry), Bytes.toBytes(innerEntry));
             }
         }
         table.put(put);

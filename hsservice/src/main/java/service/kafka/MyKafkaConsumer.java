@@ -68,7 +68,7 @@ public class MyKafkaConsumer {
                 riskEventBaseInfo.setCountry(jsonObject.getString("country"));
                 riskEventBaseInfo.setProvince(jsonObject.getString("province"));
                 riskEventBaseInfo.setCity(jsonObject.getString("city"));
-                riskEventBaseInfo.setOccurTimeDate(jsonObject.getDate("occurTimeDate"));
+                riskEventBaseInfo.setOccurTimeDateToStr(jsonObject.getString("occurTimeDateToStr"));
                 riskEventBaseInfo.setOccurTimeLong(jsonObject.getLongValue("occurTimeLong"));
                 riskEventBaseInfo.setOccurTimeStr(jsonObject.getString("occurTimeStr"));
                 resultMap.put("baseInfo", JSONObject.toJSONString(riskEventBaseInfo));
