@@ -1,6 +1,6 @@
 package sql.batch;
 
-public class RiskEventReport {
+public class RiskEventMonthReport {
 
     public static void main(String[] args) {
 
