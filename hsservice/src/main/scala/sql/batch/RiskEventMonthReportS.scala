@@ -1,5 +1,6 @@
 package sql.batch
 
+import org.apache.commons.collections.CollectionUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 
@@ -20,7 +21,26 @@ object RiskEventMonthReportS {
       calMap(map, partnerId, eventType, sum)
     })
     // 写数据
+    insertMonthData(map)
+  }
 
+  def insertMonthData(data : mutable.HashMap[String, mutable.HashMap[String, Int]]): Unit ={
+    if(data != null && data.nonEmpty){
+      data.keySet.foreach(x => {
+        val partnerId = x
+        val eventTypeMap = data.get(partnerId)
+        if(eventTypeMap != null && eventTypeMap.nonEmpty){
+          val eventStr = ""
+          eventTypeMap.get.keySet.foreach(y => {
+            val eventType = y
+            val sum = eventTypeMap.get.get(eventType)
+            if()
+            eventStr.concat(eventType).concat("_").concat(String.valueOf(sum))
+          })
+
+        }
+      })
+    }
   }
 
   /**
