@@ -1,0 +1,47 @@
+<assembly>
+    <id>package</id>
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+    <includeBaseDirectory>true</includeBaseDirectory>
+    <fileSets>
+        <fileSet>
+            <directory>src/main/resources/scripts</directory>
+            <outputDirectory>bin</outputDirectory>
+            <fileMode>0750</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>target/resources</directory>
+            <outputDirectory>conf</outputDirectory>
+            <!-- 将spring配置文件，properties配置文件，application.xml、logback.xml文件等，放到tar包中 -->
+            <!-- 像mybaties、service等配置文件、以及class类文件，还是放到jar包中 -->
+            <includes>
+                <include>properties/**</include>
+                <include>spring/**</include>
+                <include>*.xml</include>
+                <include>*.properties</include>
+            </includes>
+            <fileMode>0640</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>src/main/resources</directory>
+            <outputDirectory>conf</outputDirectory>
+            <!-- 将spring配置文件，properties配置文件，application.xml、logback.xml文件等，放到tar包中 -->
+            <!-- 像mybaties、service等配置文件、以及class类文件，还是放到jar包中 -->
+            <includes>
+                <include>files/**</include>
+            </includes>
+            <fileMode>0640</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>target</directory>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+            <excludes>
+                <exclude>*sources.jar</exclude>
+            </excludes>
+        </fileSet>
+    </fileSets>
+</assembly>
