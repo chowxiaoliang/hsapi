@@ -1,6 +1,6 @@
 package sql.batch
 
-import org.apache.commons.collections.CollectionUtils
+import hbase.{CoreOperationService, CoreOperationServiceImpl}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 
@@ -12,7 +12,7 @@ object RiskEventMonthReportS {
     val sparkConf = new SparkConf().setMaster("local[2]").setAppName("RiskEventReportS")
     val sparkSession = SparkSession.builder().config(sparkConf).enableHiveSupport().getOrCreate()
     sparkSession.sql("use anti")
-    val result = sparkSession.sql("SELECT PARTNER_ID, EVENT_TYPE,count(*) as sum FROM RISK_EVENT_HIVE WHERE OCCUR_TIME_STR >= '2020-05-01 00:00:00' and OCCUR_TIME_STR <= '2020-06-30 59:59:59' GROUP BY PARTNER_ID , EVENT_TYPE")
+    val result = sparkSession.sql("SELECT PARTNER_ID, EVENT_TYPE,count(*) as sum FROM RISK_EVENT_HIVE WHERE OCCUR_TIME_STR >= '2020-06-01 00:00:00' and OCCUR_TIME_STR <= '2020-06-30 59:59:59' GROUP BY PARTNER_ID , EVENT_TYPE")
     val map = new mutable.HashMap[String, mutable.HashMap[String, Int]]()
     result.foreach(x => {
       val partnerId = x.getString(0)
@@ -21,11 +21,16 @@ object RiskEventMonthReportS {
       calMap(map, partnerId, eventType, sum)
     })
     // 写数据
-    insertMonthData(map)
+    insertMonthData(map, sparkSession)
   }
 
-  def insertMonthData(data : mutable.HashMap[String, mutable.HashMap[String, Int]]): Unit ={
+  /**
+   * 最终的结果 xinwangbank_yyyy_MM login_10:loan_20
+   * @param data
+   */
+  def insertMonthData(data : mutable.HashMap[String, mutable.HashMap[String, Int]], sparkSession: SparkSession): Unit ={
     if(data != null && data.nonEmpty){
+      val coreOperationService: CoreOperationService = new CoreOperationServiceImpl()
       data.keySet.foreach(x => {
         val partnerId = x
         val eventTypeMap = data.get(partnerId)
@@ -34,17 +39,18 @@ object RiskEventMonthReportS {
           eventTypeMap.get.keySet.foreach(y => {
             val eventType = y
             val sum = eventTypeMap.get.get(eventType)
-            if()
-            eventStr.concat(eventType).concat("_").concat(String.valueOf(sum))
+            eventStr.concat(eventType).concat("_").concat(String.valueOf(sum)).concat(":")
           })
-
+          // 写到数据库
+          val rowKey = partnerId.concat("_2020-06")
+          coreOperationService.addRowData("RISK_EVENT_MONTH_REPORT", rowKey, "INFO", "RESULT", eventStr)
         }
       })
     }
   }
 
   /**
-   * 计算对应的关系
+   * 计算对应的关系 map(partnerId, (eventType, sum))
    * @param sourceMap
    * @param partnerId
    * @param eventType
