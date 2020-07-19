@@ -163,7 +163,7 @@ public class DataUtils {
     }
 
     public static String getEventType(){
-        String[] eventType = {"register, login, loan, pay, transfer, lend"};
+        String[] eventType = {"register", "login", "loan", "pay", "transfer", "lend"};
         return eventType[RANDOM_EVENT_TYPE.nextInt(eventType.length)];
     }
 
@@ -200,7 +200,7 @@ public class DataUtils {
     }
 
     public static String getOs(){
-        String[] os = {"Android, iOS"};
+        String[] os = {"Android", "iOS"};
         return os[RANDOM_OS.nextInt(os.length)];
     }
 

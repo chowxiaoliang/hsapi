@@ -13,7 +13,7 @@ public class MyKafkaProducer {
     static {
         Properties props = new Properties();
         // Kafka服务端的主机名和端口号
-        props.put("bootstrap.servers", "192.168.11.200:9092");
+        props.put("bootstrap.servers", "hadoop001:9092");
         // 等待所有副本节点的应答
         props.put("acks", "all");
         // 消息发送最大尝试次数

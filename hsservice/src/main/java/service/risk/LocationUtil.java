@@ -13,7 +13,7 @@ public class LocationUtil {
     /**
      * 各地区xml文件路径
      */
-    private static final String LOCAL_LIST_PATH = "D:\\projectCode\\hsapi\\hsservice\\src\\main\\resources\\LocationList.xml";
+    private static final String LOCAL_LIST_PATH = "E:\\myproject\\hsapi\\hsservice\\src\\main\\resources\\LocationList.xml";
     /**
      * 所有国家名称List
      */

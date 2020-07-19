@@ -1,7 +1,5 @@
 package service.kafka;
 
-import bean.RiskEvent;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import hbase.CoreOperationService;
 import hbase.CoreOperationServiceImpl;
@@ -11,8 +9,6 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 public class MyKafkaConsumer {
@@ -24,7 +20,7 @@ public class MyKafkaConsumer {
     static {
         Properties props = new Properties();
         // 定义kakfa 服务的地址，不需要将所有broker指定上
-        props.put("bootstrap.servers", "192.168.11.200:9092");
+        props.put("bootstrap.servers", "hadoop001:9092");
         // 制定consumer group
         props.put("group.id", "risk");
         // 是否自动确认offset
@@ -53,7 +49,7 @@ public class MyKafkaConsumer {
                 System.out.printf("offset = %d, key = %s, value = %s%n", record.offset(), record.key(), record.value());
                 String jsonData = record.value();
                 JSONObject jsonObject = JSONObject.parseObject(jsonData);
-                String rowKey = jsonObject.getString("riskFlowFlowNo");
+                String rowKey = jsonObject.getString("riskFlowNo");
                 try {
                     coreOperationService.addBatchRowData("RISK_EVENT", rowKey, jsonObject);
                 } catch (IOException e) {

@@ -10,7 +10,6 @@ import org.apache.hadoop.hbase.util.MD5Hash;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @desc 一些核心操作api的具体实现
@@ -22,8 +21,9 @@ public class CoreOperationServiceImpl implements CoreOperationService {
     static {
         try {
             Configuration configuration = HBaseConfiguration.create();
-            configuration.set("hbase.zookeeper.quorum", "hadoop001");
+            configuration.set("hbase.zookeeper.quorum", "hadoop001,hadoop002,hadoop003");
             configuration.set("hbase.zookeeper.property.clientPort", "2181");
+//            configuration.set("zookeeper.znode.parent","/hbase-unsecure");
             CONNECTION = ConnectionFactory.createConnection(configuration);
         }catch (Exception e){
             e.printStackTrace();
@@ -69,6 +69,7 @@ public class CoreOperationServiceImpl implements CoreOperationService {
 
     @Override
     public void addBatchRowData(String tableName, String rowKey, JSONObject jsonObject) throws IOException {
+        System.out.println("rowKey=" + rowKey);
         Table table = CONNECTION.getTable(TableName.valueOf(tableName));
         // 取key值的MD5前8位再拼接key值
         String md5Key = md5HashRowKey(rowKey);
