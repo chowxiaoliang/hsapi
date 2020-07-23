@@ -25,12 +25,25 @@ public class JavaRddT {
         JavaRDD<String> lines = javaSparkContext.textFile(path, 3);
         JavaRDD<String> line = lines.flatMap(s -> Arrays.asList(s.split(",")).iterator());
 
-        JavaPairRDD<String, Integer> javaPairRdd = line.mapToPair(s -> new Tuple2<>(s,1));
-        JavaPairRDD<String, Integer> resultRdd = javaPairRdd.reduceByKey(Integer::sum);
-        List<Tuple2<String, Integer>> resultList = resultRdd.collect();
-        for(Tuple2<String, Integer> tuple2 : resultList){
+        // 一种写法
+        JavaPairRDD<String, Integer> javaPairRdd1 = line.mapToPair(s -> new Tuple2<>(s,1));
+
+        JavaPairRDD<String, Integer> resultRdd1 = javaPairRdd1.reduceByKey(Integer::sum);
+        List<Tuple2<String, Integer>> resultList1 = resultRdd1.collect();
+        for(Tuple2<String, Integer> tuple2 : resultList1){
             System.out.println(tuple2);
         }
+        System.out.println("==========================================");
+        // 另一种写法
+        JavaRDD<Tuple2<String, Integer>> javaPairRdd2 = line.map(s -> new Tuple2<>(s,1));
+        List<Tuple2<String, Integer>> resultList = javaPairRdd2.collect();
+        for(Tuple2<String, Integer> tuple2 : resultList){
+            System.out.println("value:" + tuple2);
+        }
+        System.out.println("=============================================");
+        // 这种写法只能得到汇总的结果，key为最后选取的那个key
+        Tuple2<String, Integer> resultRdd2 = javaPairRdd2.reduce((s1, s2) -> new Tuple2<>(s1._1, s1._2 + s2._2));
+        System.out.println("resultRdd1=" + resultRdd2);
         javaSparkContext.stop();
     }
 }
