@@ -27,6 +27,7 @@ public class SqlOne {
         Dataset<Row> dataset = sparkSession.read().jdbc("jdbc:mysql://192.168.9.42:3306/engine", "engine_rule", properties);
 
         dataset.createOrReplaceTempView("t_rule");
+//      type DataFrame = Data<Row>
         Dataset<Row> dataResult = sparkSession.sql("select * from t_rule");
         List<Row> list = dataResult.collectAsList();
         for(Row row: list){
