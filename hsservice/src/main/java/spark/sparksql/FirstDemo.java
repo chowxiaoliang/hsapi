@@ -1,28 +1,26 @@
 package spark.sparksql;
 
-import com.google.inject.internal.asm.$ClassAdapter;
-import com.google.inject.internal.cglib.core.$DuplicatesPredicate;
-import demo.JavaRddT;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
-import scala.collection.immutable.Seq;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class FirstDemo {
 
+    private final static String FILE_PATH = "D:\\projectCode\\hsapi\\hsservice\\src\\main\\resources\\people.txt";
+
     public static void main(String[] args) throws AnalysisException {
 
         SparkSession sparkSession = SparkSession.builder().appName("firstDemo").master("local[*]").getOrCreate();
 
-//        runBasicDataFrameExample(sparkSession);
+        runBasicDataFrameExample(sparkSession);
 //        runProgrammaticSchemaExample(sparkSession);
-        runProgrammaticSchemaExampleA(sparkSession);
+//        runProgrammaticSchemaExampleA(sparkSession);
     }
 
     private static void runBasicDataFrameExample(SparkSession sparkSession) throws AnalysisException {
@@ -47,19 +45,8 @@ public class FirstDemo {
 
     }
 
-    private void runInferSchemaExample(SparkSession sparkSession){
-        // to be concluded
-        String filePath = "D:\\projectCode\\hsapi\\hsservice\\src\\main\\resources\\people.txt";
-        JavaRDD<String> javaRDD = sparkSession.sparkContext().textFile(filePath,4).toJavaRDD();
-        JavaRDD<People> javaRDD1 = javaRDD.map(x -> {
-            String[] attributes = x.split(",");
-            return new People(attributes[0], Integer.parseInt(attributes[1]));
-        });
-    }
-
     private static void runProgrammaticSchemaExample(SparkSession sparkSession){
-        String filePath = "D:\\projectCode\\hsapi\\hsservice\\src\\main\\resources\\people.txt";
-        JavaRDD<String> javaRDD = sparkSession.sparkContext().textFile(filePath, 4).toJavaRDD();
+        JavaRDD<String> javaRDD = sparkSession.sparkContext().textFile(FILE_PATH, 4).toJavaRDD();
 
         JavaRDD<Row> rowJavaRDD = javaRDD.map(x -> {
             String[] datas = x.split(",");
@@ -85,8 +72,7 @@ public class FirstDemo {
     }
 
     private static void runProgrammaticSchemaExampleA(SparkSession sparkSession){
-        String filePath = "D:\\projectCode\\hsapi\\hsservice\\src\\main\\resources\\people.txt";
-        JavaRDD<String> javaRDD = sparkSession.sparkContext().textFile(filePath, 4).toJavaRDD();
+        JavaRDD<String> javaRDD = sparkSession.sparkContext().textFile(FILE_PATH, 4).toJavaRDD();
         /**
          * 第一步：在RDD的基础上创建类型为Row的RDD
          */
