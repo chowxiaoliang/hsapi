@@ -1,30 +1,40 @@
 package spark.sparksql;
 
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
+import spark.People;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FirstDemo {
+/**
+ * 根据不同的数据源创建dataFrame的方式(RDD,dataSet,dataFrame之间的区别，实际就是创建dataFrame)
+ * 三个步骤：
+ * 1.创建javaRDD
+ * 2.创建StructType的schema，与rowJavaRDD结构相匹配
+ * 3.通过sparkSession的createDataFrame把schema应用到rowJavaRDD上面形成新的dataFrame
+ */
+public class DataFrameCreation {
 
-    private final static String FILE_PATH = "D:\\projectCode\\hsapi\\hsservice\\src\\main\\resources\\people.txt";
+    private final static String FILE_PATH = "E:\\myproject\\hsapi\\hsservice\\src\\main\\resources\\people.txt";
 
     public static void main(String[] args) throws AnalysisException {
 
         SparkSession sparkSession = SparkSession.builder().appName("firstDemo").master("local[*]").getOrCreate();
 
-        runBasicDataFrameExample(sparkSession);
+//        runBasicDataFrameExample(sparkSession);
 //        runProgrammaticSchemaExample(sparkSession);
 //        runProgrammaticSchemaExampleA(sparkSession);
+        createDataFrameByReflect(sparkSession);
     }
 
     private static void runBasicDataFrameExample(SparkSession sparkSession) throws AnalysisException {
-        Dataset<Row> dataset = sparkSession.read().json("D:\\projectCode\\hsapi\\hsservice\\src\\main\\resources\\people.json");
+        Dataset<Row> dataset = sparkSession.read().json("E:\\myproject\\hsapi\\hsservice\\src\\main\\resources\\people.json");
         dataset.printSchema();
         dataset.show();
         // api里面可以直接写各种条件
@@ -104,29 +114,24 @@ public class FirstDemo {
         sparkSession.close();
     }
 
-    class People {
-        private String name;
-        private int age;
+    /**
+     * 反射的方式推导出schema
+     * @param sparkSession
+     */
+    private static void createDataFrameByReflect(SparkSession sparkSession){
+        JavaRDD<String> javaRDD = sparkSession.sparkContext().textFile(FILE_PATH, 4).toJavaRDD();
+        JavaRDD<People> peopleJavaRDD = javaRDD.map((Function<String, People>) s -> {
+            String[] strs = s.split(",");
+            return new People(strs[0], Integer.parseInt(strs[1]));
+        });
 
-        public People(String name, int age){
-            this.name = name;
-            this.age = age;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public int getAge() {
-            return age;
-        }
-
-        public void setAge(int age) {
-            this.age = age;
+        Dataset<Row> rowJavaRDD = sparkSession.createDataFrame(peopleJavaRDD, People.class);
+        rowJavaRDD.show();
+        List<Row> list = rowJavaRDD.collectAsList();
+        for(Row row : list){
+            System.out.println(row.get(0).toString());
+            System.out.println(row.get(1).toString());
         }
     }
+
 }
