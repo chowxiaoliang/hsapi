@@ -1,18 +1,15 @@
-package sql;
+package spark.sparksql;
 
 import org.apache.avro.ipc.DatagramServer;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
-import org.apache.spark.sql.DataFrameReader;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
 
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Properties;
 
-public class SqlOne {
+public class JdbcResource {
 
     public static void main(String[] args) {
 
@@ -29,6 +26,7 @@ public class SqlOne {
         dataset.createOrReplaceTempView("t_rule");
 //      type DataFrame = Data<Row>
         Dataset<Row> dataResult = sparkSession.sql("select * from t_rule");
+        dataResult.write().format("json").mode(SaveMode.Overwrite).save("D:\\bigdata\\sqlSaveReslut");
         List<Row> list = dataResult.collectAsList();
         for(Row row: list){
             System.out.println(row.toString());
