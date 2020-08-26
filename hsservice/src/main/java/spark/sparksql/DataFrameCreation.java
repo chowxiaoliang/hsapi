@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class DataFrameCreation {
 
-    private final static String FILE_PATH = "E:\\myproject\\hsapi\\hsservice\\src\\main\\resources\\people.txt";
+    private final static String FILE_PATH = "D:\\projectCode\\hsapi\\hsservice\\src\\main\\resources\\people.txt";
 
     public static void main(String[] args) throws AnalysisException {
 
@@ -126,6 +126,7 @@ public class DataFrameCreation {
         });
 
         Dataset<Row> rowJavaRDD = sparkSession.createDataFrame(peopleJavaRDD, People.class);
+        rowJavaRDD.write().mode(SaveMode.Overwrite).save("D:\\bigdata\\saveResult");
         rowJavaRDD.show();
         List<Row> list = rowJavaRDD.collectAsList();
         for(Row row : list){
