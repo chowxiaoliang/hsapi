@@ -32,7 +32,7 @@ public class Window {
         JavaDStream<String> javaDStream = javaReceiverInputDStream.map( x -> x.split(" ")[0]);
         JavaPairDStream<String, Integer> javaPairDStream = javaDStream.mapToPair(x -> new Tuple2<>(x, 1));
 
-        // 滑动窗口的大小是60s，也就是12个RDD，滑动间隔是20s（每隔20s往前回溯12个RDD进行计算）
+        // 滑动窗口的大小是60s，也就是12个RDD，滑动间隔是20s（每隔20s往前回溯12个RDD进行计算）(每四个批次计算一次窗口的结果)
         JavaPairDStream<String, Integer> resultPairDStream = javaPairDStream.reduceByKeyAndWindow((Function2<Integer, Integer, Integer>) Integer::sum, Durations.seconds(60), Durations.seconds(20));
         resultPairDStream.print();
         javaStreamingContext.start();
