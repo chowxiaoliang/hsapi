@@ -126,13 +126,21 @@ public class DataFrameCreation {
         });
 
         Dataset<Row> rowJavaRDD = sparkSession.createDataFrame(peopleJavaRDD, People.class);
-        rowJavaRDD.write().mode(SaveMode.Overwrite).save("D:\\bigdata\\saveResult");
         rowJavaRDD.show();
         List<Row> list = rowJavaRDD.collectAsList();
         for(Row row : list){
             System.out.println(row.get(0).toString());
             System.out.println(row.get(1).toString());
         }
+        // 将数据写到文件
+        rowJavaRDD.write().mode(SaveMode.Overwrite).save("D:\\bigdata\\saveResult");
+        // 将数据写到mysql(一定要注意，javaRDD里面的字段名称和数据库表里面的要能对应上！)
+        rowJavaRDD.write().mode(SaveMode.Append).format("jdbc")
+                .option("url", "")
+                .option("user", "")
+                .option("password", "")
+                .option("table", "")
+                .save();
     }
 
 }
