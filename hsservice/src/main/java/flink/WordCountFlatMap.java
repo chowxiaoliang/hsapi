@@ -6,7 +6,7 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 
-public class WordCount {
+public class WordCountFlatMap {
 
     public static void main(String[] args) throws Exception {
 

@@ -3,7 +3,7 @@ package flink;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
-public class MapDemo {
+public class TextStreaming {
 
     private static int index = 0;
 
