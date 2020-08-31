@@ -1,17 +1,13 @@
-package demo;
+package spark.core;
 
 import org.apache.spark.SparkConf;
-import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.rdd.RDD;
 import scala.Tuple2;
 
-import javax.swing.*;
 import java.util.Arrays;
 import java.util.List;
-import java.util.StringTokenizer;
 
 public class JavaRddT {
 
