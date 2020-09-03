@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 /**
  * flink 相关的算子 参考:https://www.jianshu.com/p/a0bb414b4c81
+ *                      https://www.jianshu.com/p/6a726f2f7137
  */
 public class Transformations {
 
