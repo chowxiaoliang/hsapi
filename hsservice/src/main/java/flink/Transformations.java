@@ -1,16 +1,9 @@
 package flink;
 
-import org.apache.flink.api.common.functions.*;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.aggregation.Aggregations;
-import org.apache.flink.api.java.operators.CoGroupOperator;
-import org.apache.flink.api.java.tuple.Tuple;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.util.Collector;
 
 import java.util.Arrays;
-import java.util.stream.StreamSupport;
 
 /**
  * flink 相关的算子 参考:https://www.jianshu.com/p/a0bb414b4c81
@@ -35,7 +28,7 @@ public class Transformations {
         // distinct 去重
 //        DataSet<Integer> resultSet = dataSet.distinct();
 
-        // groupBy现根据二元组里面的某个字段分组,aggregate再根据二元组里面的某个字段聚合
+        // groupBy先根据二元组里面的某个字段分组,aggregate再根据二元组里面的某个字段聚合
 //        DataSet<Tuple2<Integer, Integer>> tuple2DataSet = executionEnvironment.fromElements(
 //                Tuple2.of(1,2),
 //                Tuple2.of(2,2),
@@ -69,7 +62,7 @@ public class Transformations {
 //            }
 //        });
 
-        // union 联合两个rdd，不排除任何元素
+        // Union 联合两个rdd，不排除任何元素
 //        DataSet<Integer> anotherSet = executionEnvironment.fromCollection(Arrays.asList(6,7,8,9,10));
 //        DataSet<Integer> resultSet = dataSet.union(anotherSet);
 
