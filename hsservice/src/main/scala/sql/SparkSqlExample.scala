@@ -9,7 +9,7 @@ object SparkSqlExample {
 
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder().appName("spark sql basic example")
-      .config("spark.some.config.option","some-value").master("local[1]")
+      .config("spark.some.config.properties.option","some-value").master("local[1]")
       .getOrCreate()
 
 //    runBasicDataFrameExample(spark)
