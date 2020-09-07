@@ -1,0 +1,25 @@
+1.hive走通intellij本地通过sparkSql访问hive  参考：
+
+https://blog.csdn.net/weixin_43093501/article/details/95023669
+https://www.cnblogs.com/LHWorldBlog/p/8431750.html
+https://blog.csdn.net/u013164612/article/details/80498254?utm_medium=distribute.pc_relevant_t0.none-task-blog-BlogCommendFromMachineLearnPai2-1.add_param_isCf&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-BlogCommendFromMachineLearnPai2-1.add_param_isCf
+https://blog.csdn.net/baymax_007/article/details/82191188?utm_medium=distribute.pc_aggpage_search_result.none-task-blog-2~all~first_rank_v2~rank_v25-8-82191188.nonecase&utm_term=sparksql%20%E8%AF%BB%E5%86%99hbase
+https://blog.csdn.net/u013164612/article/details/80498254?utm_medium=distribute.pc_relevant_t0.none-task-blog-BlogCommendFromMachineLearnPai2-1.add_param_isCf&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-BlogCommendFromMachineLearnPai2-1.add_param_isCf
+
+*hive设置使用spark 的计算模型
+// 使用Hive On Spark非常简单
+// 只要用set hive.execution.engine命令设置Hive的执行引擎为spark即可
+// 默认是mr
+set hive.execution.engine=spark;
+// 这里，是完全可以将其设置为Spark Master的URL地址的
+set spark.master=spark://192.168.1.107:7077
+
+https://github.com/Dang-h/HiveSQL
+
+2.hive排序相关： order by (全局排序) sort by（局部排序） distribute by（分区排序）
+
+3.hive表类型相关：内部表，外部表，分区表（分目录），分桶表，拉链表
+                 分桶表参考：https://www.jianshu.com/p/922e2e37ae22
+
+4.hive窗口函数：参考：https://www.cnblogs.com/alexzhang92/p/10650990.html
+                     https://www.jianshu.com/p/12eaf61cf6e1
