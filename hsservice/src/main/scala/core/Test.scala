@@ -9,7 +9,7 @@ object Test {
 
   def main(args: Array[String]): Unit = {
     val sparkConf = new SparkConf()
-    sparkConf.setAppName("Test")
+    sparkConf.setAppName("People")
     sparkConf.setMaster("local[1]")
     val sparkContext = new SparkContext(sparkConf)
 //    val rdd = sparkContext.parallelize(List(1,2,3,4,5))
