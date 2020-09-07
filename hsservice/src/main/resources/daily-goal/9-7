@@ -7,6 +7,14 @@ https://blog.csdn.net/baymax_007/article/details/82191188?utm_medium=distribute.
 https://blog.csdn.net/u013164612/article/details/80498254?utm_medium=distribute.pc_relevant_t0.none-task-blog-BlogCommendFromMachineLearnPai2-1.add_param_isCf&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-BlogCommendFromMachineLearnPai2-1.add_param_isCf
 https://www.aboutyun.com/forum.php?mod=viewthread&tid=24432&fromguid=hot
 
+sparkSql兼容hive
+sparkSql也可以创建自己的元数据信息，只不过不能像hive那样将元数据信息持久化到mysql
+hive的元数据信息保存在mysql，真正的数据在hdfs，其使用的执行引擎默认是mapreduce，可以替换为spark
+
+sparkSql连接hive使用其元数据信息去操作对应的数据。
+
+任务：hbase挂掉的情况下，hive操作对应的数据，看看是否可以操作成功！
+
 *hive设置使用spark 的计算模型
 // 使用Hive On Spark非常简单
 // 只要用set hive.execution.engine命令设置Hive的执行引擎为spark即可
