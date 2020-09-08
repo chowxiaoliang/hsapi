@@ -20,14 +20,14 @@ HQL是SQL在Hive中的”方言”，它的解析借助开源语法分析器antr
 无论Sql还是Hql，在经过解析后生成的AST都是相同的，后续的analyze，optimize和execute流程都是相同的。
 参考:https://blog.csdn.net/u010385646/article/details/53207852
 
-任务：hbase挂掉的情况下，hive操作对应的数据，看看是否可以操作成功！
+任务：hbase挂掉的情况下，hive操作对应的数据，看看是否可以操作成功！(不能成功)
 
 *hive设置使用spark 的计算模型
 // 使用Hive On Spark非常简单
 // 只要用set hive.execution.engine命令设置Hive的执行引擎为spark即可
 // 默认是mr
 set hive.execution.engine=spark;
-// 这里，是完全可以将其设置为Spark Master的URL地址的
+// 这里，是完全可以将其设置为Spark Master的URL地址的4
 set spark.master=spark://192.168.1.107:7077
 
 https://github.com/Dang-h/HiveSQL
