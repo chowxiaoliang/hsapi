@@ -13,7 +13,7 @@ import java.util.Map;
 
 /**
  * @author zhouliang
- * @desc 月报表
+ * @desc 月报表(sparkSql读取hive的方式)
  */
 public class RiskEventMonthReport {
 
