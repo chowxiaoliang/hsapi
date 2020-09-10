@@ -2,29 +2,29 @@ package service.project.report;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.datastream.DataStreamSink;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.sink.PrintSinkFunction;
-import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.connectors.redis.RedisSink;
 import org.apache.flink.streaming.connectors.redis.common.config.FlinkJedisClusterConfig;
+import org.apache.flink.streaming.connectors.redis.common.mapper.RedisCommand;
 import org.apache.flink.streaming.connectors.redis.common.mapper.RedisCommandDescription;
 import org.apache.flink.streaming.connectors.redis.common.mapper.RedisMapper;
 import org.apache.flink.util.Collector;
-import spark.streaming.KafkaDataSource;
 
 import java.net.InetSocketAddress;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
+/**
+ * 风险地图（窗口的大小和间隔都是5min,风险即为拒绝的案件）
+ * 利用flink的滚动窗口功能
+ */
 public class RiskAndUserMap {
 
     public static void main(String[] args) throws Exception {
@@ -49,11 +49,26 @@ public class RiskAndUserMap {
 
         DataStreamSource<String> dataStreamSource = streamExecutionEnvironment.addSource(new FlinkKafkaConsumer<>(topic, new SimpleStringSchema(), properties));
 
-        InetSocketAddress inetSocketAddress = new InetSocketAddress("192.168.229.128", 6379);
+        InetSocketAddress inetSocketAddress = new InetSocketAddress("192.168.11.200", 6374);
         Set<InetSocketAddress> set = new HashSet<>();
         set.add(inetSocketAddress);
         FlinkJedisClusterConfig flinkJedisClusterConfig = new FlinkJedisClusterConfig.Builder().setNodes(set).build();
 
+//        GenericObjectPoolConfig genericObjectPoolConfig = new GenericObjectPoolConfig();
+//        genericObjectPoolConfig.setMaxIdle(flinkJedisClusterConfig.getMaxIdle());
+//        genericObjectPoolConfig.setMaxTotal(flinkJedisClusterConfig.getMaxTotal());
+//        genericObjectPoolConfig.setMinIdle(flinkJedisClusterConfig.getMinIdle());
+//
+//        JedisCluster jedisCluster = new JedisCluster(flinkJedisClusterConfig.getNodes(), flinkJedisClusterConfig.getConnectionTimeout(),
+//                flinkJedisClusterConfig.getMaxRedirections(), genericObjectPoolConfig);
+//        int time = 1;
+//        if (jedisCluster.get("time") != null){
+//            time = Integer.parseInt(jedisCluster.get("time"));
+//        }
+//        if(time > 5){
+//            time = 1;
+//        }
+//        System.out.println("获取到的时间间隔是：" + time);
 
         DataStream<Tuple2<String, Integer>> dataStream = dataStreamSource.flatMap(new FlatMapFunction<String, Tuple2<String, Integer>>() {
             @Override
@@ -63,30 +78,33 @@ public class RiskAndUserMap {
                     collector.collect(new Tuple2<>(letter, 1));
                 }
             }
-        }).keyBy(0).timeWindow(Time.seconds(1), Time.seconds(1)).sum(1);
+        }).keyBy(0).timeWindow(Time.minutes(5), Time.minutes(5)).sum(1);
 //        dataStream.print();
         // 同样的效果(打印数据)
 //        dataStream.addSink(new PrintSinkFunction<>());
-        dataStream.addSink(new RedisSink<scala.Tuple2<String, Integer>>(flinkJedisClusterConfig, new myRedisMapper()))
+        dataStream.addSink(new RedisSink<>(flinkJedisClusterConfig, new myRedisMapper()));
         streamExecutionEnvironment.execute("test");
 
     }
 
-    private static class myRedisMapper implements RedisMapper<scala.Tuple2<String, Integer>>{
+    private static class myRedisMapper implements RedisMapper<Tuple2<String, Integer>>{
 
         @Override
         public RedisCommandDescription getCommandDescription() {
-            return null;
+            return new RedisCommandDescription(RedisCommand.SET, "flink");
         }
 
         @Override
-        public String getKeyFromData(scala.Tuple2<String, Integer> stringIntegerTuple2) {
-            return null;
+        public String getKeyFromData(Tuple2<String, Integer> stringIntegerTuple2) {
+            System.out.println("key=" + stringIntegerTuple2.f0);
+            stringIntegerTuple2.setField(stringIntegerTuple2.f0 + stringIntegerTuple2.f1, 1);
+            return stringIntegerTuple2.f0;
         }
 
         @Override
-        public String getValueFromData(scala.Tuple2<String, Integer> stringIntegerTuple2) {
-            return null;
+        public String getValueFromData(Tuple2<String, Integer> stringIntegerTuple2) {
+            System.out.println("value=" + String.valueOf(stringIntegerTuple2.f1));
+            return String.valueOf(stringIntegerTuple2.f1);
         }
     }
 }
