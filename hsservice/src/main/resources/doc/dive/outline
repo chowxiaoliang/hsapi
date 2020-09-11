@@ -11,3 +11,47 @@
 hive的序列化和反序列化（SerDe）
 
 
+分桶表：
+    桶是比表或分区更为细粒度的数据范围划分。针对某一列进行桶的组织，对列值哈希，然后除以桶的个数求余，决定将该条记录存放到哪个桶中。
+
+    1.获得更高的查询处理效果
+    2.抽样调查
+
+    创建分桶表：
+    create table bucketed_user
+    (id int ,name string) clustered by (id)  into 4 buckets
+    stored as orc;
+
+    添加数据之前需要先开启分桶：
+    set hive.enforce.bucketing=true;
+
+    导入数据：
+    insert into table bucketed_user select user_id, order_id from orders;
+
+    查询数据：
+    select * from bucketed_user tablesample(bucket 1 out of 16 on id) limit 50;
+
+    tablesample(bucket x out of y)
+    x:表示从第几桶开始抽数据（1，2，3，4）
+    y:表示抽数据的比例，是抽数据的分母
+
+    比如：有4个桶
+    tablesample(bucket 1 out of 16) 表示从第一桶开始，抽取第一桶的数据的比例为（4（桶数）/16（分母））=1/4，抽取第一桶1/4的数据
+    tablesample(bucket 2 out of 32) 表示从第二桶开始，抽取第二桶的数据的比例为（4（桶树）/32（分母））=1/8，抽取第二桶1/8的数据
+
+
+把表或分区划分成bucket：
+    1.更快，桶为表加上额外结构，链接相同列划分了桶的表，可以使用map-side join更加高效。
+    2.取样sampling更高效。没有分区的话需要扫描整个数据集。
+
+注意点：
+    1.CLUSTERED BY来指定划分桶所用列和划分桶的个数。HIVE对key的hash值除bucket个数取余数，保证数据均匀随机分布在所有bucket里。
+    2.SORTED BY对桶中的一个或多个列另外排序
+
+总结：
+    我们发现其实桶的概念就是MapReduce的分区的概念，两者完全相同。物理上每个桶就是目录里的一个文件，一个作业产生的桶（输出文件）数量和reduce任务个数相同。
+    而分区表的概念，则是新的概念。分区代表了数据的仓库，也就是文件夹目录。每个文件夹下面可以放不同的数据文件。通过文件夹可以查询里面存放的文件。但文件夹本身和数据的内容毫无关系。
+    桶则是按照数据内容的某个值进行分桶，把一个大文件散列称为一个个小文件。
+
+    这些小文件可以单独排序。如果另外一个表也按照同样的规则分成了一个个小文件。两个表join的时候，就不必要扫描整个表，只需要匹配相同分桶的数据即可。效率当然大大提升。
+    同样，对数据抽样的时候，也不需要扫描整个文件。只需要对每个分区按照相同规则抽取一部分数据即可。
