@@ -1,0 +1,11 @@
+什么是spark的checkpoint机制？
+    checkpoint是spark的一种容错机制
+    Spark 在生产环境下经常会面临 Transformation 的 RDD 非常多(例如一个Job 中包含1万个RDD) 或者是具体的 Transformation 产生的 RDD 本身计算特别复杂和耗时(例如计算时常超过1个小时) , 这个时候如果可以对计算的过程进行复用，就可以极大的提升效率，此时我们必需考虑对计算结果的持久化。
+    如果采用 persists 把数据持久化在内存中的话，虽然最快速但是也是最不可靠的（内存清理）；如果放在磁盘上也不是完全可靠的，例如磁盘会损坏，系统管理员可能会清空磁盘。
+    Checkpoint 的产生就是为了相对而言更加可靠的持久化数据，在 Checkpoint 可以指定把数据放在本地并且是多副本的方式，在正常生产环境下通常放在 HDFS 上，借助HDFS 高可靠的特征来实现更可靠的数据持久化。
+
+checkpoint在spark中的两块应用：
+    （1）一块是在spark core中对RDD做checkpoint，将RDD数据保存到可靠存储（如HDFS）以便数据恢复；
+    通过将计算代价较大的 RDD checkpoint 一下，当下游 RDD 计算出错时，可以直接从 checkpoint 过的 RDD 那里读取数据继续算。
+    （2）应用在spark streaming中，使用checkpoint用来保存DStreamGraph以及相关配置信息，以便在Driver崩溃重启的时候能够接着之前进度继续进行处理（如之前waiting batch的job会在重启后继续处理）。
+
