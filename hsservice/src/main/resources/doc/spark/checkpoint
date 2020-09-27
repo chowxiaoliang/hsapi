@@ -9,3 +9,24 @@ checkpoint在spark中的两块应用：
     通过将计算代价较大的 RDD checkpoint 一下，当下游 RDD 计算出错时，可以直接从 checkpoint 过的 RDD 那里读取数据继续算。
     （2）应用在spark streaming中，使用checkpoint用来保存DStreamGraph以及相关配置信息，以便在Driver崩溃重启的时候能够接着之前进度继续进行处理（如之前waiting batch的job会在重启后继续处理）。
 
+针对checkpoint的写入流程，主要有以下三个问题：
+    Q1：RDD中的数据是什么时候写入的？是在rdd调用checkpoint方法时候吗？
+    Q2：在做checkpoint的时候，具体写入了哪些数据到HDFS了？
+    Q3：在对RDD做完checkpoint以后，对做RDD的本省又做了哪些收尾工作？
+弄清楚了以上三个问题，我想对checkpoint的写过程也就基本清楚了。接下来将一一回答上面提出的问题。
+    A1：首先看一下RDD中checkpoint方法，可以看到在该方法中是只是新建了一个ReliableRDDCheckpintData的对象，并没有做实际的写入工作。实际触发写入的时机是在runJob生成改RDD后，调用RDD的doCheckpoint方法来做的。
+    A2：在经历调用RDD.doCheckpoint → RDDCheckpintData.checkpoint → ReliableRDDCheckpintData.doCheckpoint → ReliableRDDCheckpintData.writeRDDToCheckpointDirectory后，在writeRDDToCheckpointDirectory方法中可以看到：将作为一个单独的任务（RunJob）将RDD中每个parition的数据依次写入到checkpoint目录（writePartitionToCheckpointFile），此外如果该RDD中的partitioner如果不为空，则也会将该对象序列化后存储到checkpoint目录。所以，在做checkpoint的时候，写入hdfs中的数据主要包括：RDD中每个parition的实际数据，以及可能的partitioner对象（writePartitionerToCheckpointDir）。
+    A3：在写完checkpoint数据到hdfs以后，将会调用rdd的markCheckpoined方法，主要斩断该rdd的对上游的依赖，以及将paritions置空等操作。
+
+
+Spark core的checkpoint
+（1）什么时候写checkpoint数据？
+    当RDD的action算子触发计算结束后会执行checkpoint。
+（3）什么时候读checkpoint数据？
+    task计算失败的时候会从checkpoint读取数据进行计算。
+
+spark streaming的checkpoint
+（1）什么时候写checkpoint数据？
+    在spark streaming中每generate一个batch的RDD会触发checkpoint操作。
+（2）checkpoint存储的内容？
+    对于kafka的DirectKafkaInputDStreamCheckpointData，实质是重写DStreamCheckpointData的update和restore方法，这样checkpoint的数据就是topic，partition，fromOffset和untilOffset（起始偏移量）。
