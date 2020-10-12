@@ -7,3 +7,4 @@
     2.单个task处理数据过多，很容易导致oom
     3.Executor Kill lost,Shuffle error
 
+https://blog.csdn.net/kaede1209/article/details/81145560
