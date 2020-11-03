@@ -204,6 +204,8 @@ public class CoreOperationServiceImpl implements CoreOperationService {
 
     /**
      * 利用san+filter方式查询hbase时，一定要设置starRow 和stopRow
+     * 参考：
+     * https://blog.csdn.net/javajxz008/article/details/51833982?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.pc_relevant_is_cache&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.pc_relevant_is_cache
      * @param tableName
      * @throws IOException
      */
@@ -219,10 +221,7 @@ public class CoreOperationServiceImpl implements CoreOperationService {
         Filter starTimeFilter = new RowFilter(CompareFilter.CompareOp.GREATER_OR_EQUAL,
                 new BinaryPrefixComparator(DateUtil.formatDate(startTime, "yyyyMMddHHmmssSSS").getBytes()));
         filterList.addFilter(starTimeFilter);
-
-
         //开头小于等于endTime的行
-
         Filter endTimeFilter = new RowFilter(CompareFilter.CompareOp.LESS_OR_EQUAL,
                 new BinaryPrefixComparator(DateUtil.formatDate(endTime, "yyyyMMddHHmmssSSS").getBytes()));
         filterList.addFilter(endTimeFilter);
