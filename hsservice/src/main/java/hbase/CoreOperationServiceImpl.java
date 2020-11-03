@@ -1,18 +1,28 @@
 package hbase;
 
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.httpclient.util.DateUtil;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.filter.*;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.MD5Hash;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
  * @desc 一些核心操作api的具体实现
+ * HBase的查询实现只提供两种方式：
+ * 1、按指定RowKey 获取唯一一条记录，get方法（org.apache.hadoop.hbase.client.Get）
+ * Get 的方法处理分两种 : 设置了ClosestRowBefore 和没有设置的rowlock .主要是用来保证行的事务性，即每个get是以一个row来标记的.一个row中可以有很多family 和column.
+ * 2、按指定的条件获取一批记录，scan方法(org.apache.Hadoop.hbase.client.Scan）实现条件查询功能使用的就是scan方式.
+ * 1)scan 可以通过setCaching 与setBatch 方法提高速度(以空间换时间)；
+ * 2)scan 可以通过setStartRow 与setEndRow 来限定范围([start，end)start 是闭区间，end 是开区间)。范围越小，性能越高。
+ * 3)、scan 可以通过setFilter 方法添加过滤器，这也是分页、多条件查询的基础。
  */
 public class CoreOperationServiceImpl implements CoreOperationService {
 
@@ -157,6 +167,27 @@ public class CoreOperationServiceImpl implements CoreOperationService {
     }
 
     @Override
+    public void getMultiRows(String tableName, List<String> rowKeyList) throws IOException {
+        Table table = CONNECTION.getTable(TableName.valueOf(tableName));
+        List<Get> getList = new ArrayList<>();
+        for(String rowKey : rowKeyList){
+            Get get = new Get(Bytes.toBytes(rowKey));
+            getList.add(get);
+        }
+        Result[] results = table.get(getList);
+        for(Result result : results){
+            Cell[] cells = result.rawCells();
+            for(Cell cell : cells){
+                System.out.println("行键:" + Bytes.toString(result.getRow()));
+                System.out.println("列族" + Bytes.toString(CellUtil.cloneFamily(cell)));
+                System.out.println("列:" + Bytes.toString(CellUtil.cloneQualifier(cell)));
+                System.out.println("值:" + Bytes.toString(CellUtil.cloneValue(cell)));
+                System.out.println("时间戳:" + cell.getTimestamp());
+            }
+        }
+    }
+
+    @Override
     public void getRowQualifier(String tableName, String rowKey, String columnFamily, String qualifier) throws IOException {
         Table hTable = CONNECTION.getTable(TableName.valueOf(tableName));
         Get get = new Get(Bytes.toBytes(rowKey));
@@ -168,6 +199,45 @@ public class CoreOperationServiceImpl implements CoreOperationService {
             System.out.println("列:" + Bytes.toString(CellUtil.cloneQualifier(cell)));
             System.out.println("值:" + Bytes.toString(CellUtil.cloneValue(cell)));
             System.out.println("时间戳:" + cell.getTimestamp());
+        }
+    }
+
+    /**
+     * 利用san+filter方式查询hbase时，一定要设置starRow 和stopRow
+     * @param tableName
+     * @throws IOException
+     */
+    @Override
+    public void getRowsByScanAndFilter(String tableName) throws IOException {
+        Table table = CONNECTION.getTable(TableName.valueOf(tableName));
+        Scan scan = new Scan();
+        scan.setStartRow("startRow".getBytes());
+        scan.setStopRow("stopRow".getBytes());
+        Date startTime = new Date();
+        Date endTime = new Date();
+        FilterList filterList = new FilterList(FilterList.Operator.MUST_PASS_ALL);
+        Filter starTimeFilter = new RowFilter(CompareFilter.CompareOp.GREATER_OR_EQUAL,
+                new BinaryPrefixComparator(DateUtil.formatDate(startTime, "yyyyMMddHHmmssSSS").getBytes()));
+        filterList.addFilter(starTimeFilter);
+
+
+        //开头小于等于endTime的行
+
+        Filter endTimeFilter = new RowFilter(CompareFilter.CompareOp.LESS_OR_EQUAL,
+                new BinaryPrefixComparator(DateUtil.formatDate(endTime, "yyyyMMddHHmmssSSS").getBytes()));
+        filterList.addFilter(endTimeFilter);
+        scan.setFilter(filterList);
+        ResultScanner resultScanner = table.getScanner(scan);
+        for(Result result : resultScanner){
+            Cell[] cells = result.rawCells();
+            for(Cell cell : cells){
+                //得到rowkey
+                System.out.println("行键:" + Bytes.toString(CellUtil.cloneRow(cell)));
+                //得到列族
+                System.out.println("列族" + Bytes.toString(CellUtil.cloneFamily(cell)));
+                System.out.println("列:" + Bytes.toString(CellUtil.cloneQualifier(cell)));
+                System.out.println("值:" + Bytes.toString(CellUtil.cloneValue(cell)));
+            }
         }
     }
 

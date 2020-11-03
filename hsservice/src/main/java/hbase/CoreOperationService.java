@@ -70,6 +70,14 @@ public interface CoreOperationService {
     void getRow(String tableName, String rowKey) throws IOException;
 
     /**
+     * 根据行键集合获取多行数据
+     * @param tableName
+     * @param rowKeyList
+     * @throws IOException
+     */
+    void getMultiRows(String tableName, List<String> rowKeyList) throws IOException;
+
+    /**
      * 根据某一行指定的（列族：列 ）获取数据
      * @param tableName
      * @param rowKey
@@ -77,4 +85,11 @@ public interface CoreOperationService {
      * @param qualifier
      */
     void getRowQualifier(String tableName, String rowKey, String columnFamily, String qualifier) throws IOException;
+
+    /**
+     * 根据scan和filter获取多行数据
+     * @param tableName
+     * @throws IOException
+     */
+    void getRowsByScanAndFilter(String tableName) throws IOException;
 }
