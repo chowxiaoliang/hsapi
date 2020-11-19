@@ -11,7 +11,17 @@ package algorithm.hash;
  */
 public class Times33 {
     public static void main(String[] args) {
+        System.out.println(time33("zhouliang"));
 
+    }
 
+    static int time33(String str) {
+        int len = str.length();
+        int hash = 0;
+        for (int i = 0; i < len; i++){
+            // (hash << 5) + hash 相当于 hash * 33
+            hash = (hash << 5) + hash + (int) str.charAt(i);
+        }
+        return hash;
     }
 }
