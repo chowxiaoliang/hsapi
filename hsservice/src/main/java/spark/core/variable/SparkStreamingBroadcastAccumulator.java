@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class SparkStreamingBroadcastAccumulator {
 
-    private static volatile Accumulator accumulator;
+    private static volatile LongAccumulator longAccumulator;
     private static volatile Broadcast<List<String>> broadcast;
 
     public static void main(String[] args) {
@@ -35,13 +35,14 @@ public class SparkStreamingBroadcastAccumulator {
         SparkConf sparkConf = new SparkConf();
         sparkConf.setMaster("local[*]").setAppName("SparkStreamingBroadcastAccumulator");
         JavaStreamingContext javaStreamingContext = new JavaStreamingContext(sparkConf, Durations.seconds(3));
-        JavaSparkContext javaSparkContext = javaStreamingContext.sparkContext();
+        SparkContext javaSparkContext = javaStreamingContext.sparkContext().sc();
         javaSparkContext.setLogLevel("error");
 
-        accumulator = javaSparkContext.intAccumulator(0, "t");
-        broadcast = javaSparkContext.broadcast(Arrays.asList("zhou", "liang"));
+        longAccumulator = javaSparkContext.longAccumulator("t");
+
+        broadcast = javaStreamingContext.sparkContext().broadcast(Arrays.asList("zhou", "liang"));
         System.out.println("=========开始监听数据==============");
-        System.out.println(" BlackList appeared : " + accumulator.value() + " times");
+        System.out.println(" BlackList appeared : " + longAccumulator.value() + " times");
         JavaReceiverInputDStream<String> javaReceiverInputDStream = javaStreamingContext.socketTextStream("localhost", 8080);
         javaReceiverInputDStream.print();
 
@@ -51,12 +52,14 @@ public class SparkStreamingBroadcastAccumulator {
                 return new Tuple2<>(s, 1);
             }
         });
+        javaPairDStream.print();
         JavaPairDStream<String, Integer> javaPairDStream1 = javaPairDStream.reduceByKey(new Function2<Integer, Integer, Integer>() {
             @Override
             public Integer call(Integer v1, Integer v2) throws Exception {
                 return v1 + v2;
             }
         });
+        javaPairDStream1.print();
         javaPairDStream1.foreachRDD(new VoidFunction<JavaPairRDD<String, Integer>>() {
             @Override
             public void call(JavaPairRDD<String, Integer> stringIntegerJavaPairRDD) throws Exception {
@@ -64,7 +67,7 @@ public class SparkStreamingBroadcastAccumulator {
                     @Override
                     public Boolean call(Tuple2<String, Integer> v1) throws Exception {
                         if (broadcast.value().contains(v1._1)){
-                            accumulator.add(v1._2);
+                            longAccumulator.add(v1._2);
                             return false;
                         }else {
                             return true;
@@ -73,7 +76,7 @@ public class SparkStreamingBroadcastAccumulator {
                 }).collect();
             }
         });
-        System.out.println(" BlackList appeared : " + accumulator.value() + " times");
+        System.out.println(" BlackList appeared : " + longAccumulator.value() + " times");
         javaStreamingContext.start();
         try {
             javaStreamingContext.awaitTermination();
