@@ -221,6 +221,12 @@
             <artifactId>dom4j</artifactId>
             <version>1.6.1</version>
         </dependency>
+        <!-- google工具 -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0</version>
+        </dependency>
     </dependencies>
     <!--编译打包插件-->
     <build>
