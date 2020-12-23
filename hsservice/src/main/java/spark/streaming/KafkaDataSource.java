@@ -1,18 +1,18 @@
 package spark.streaming;
 
+import kafka.serializer.StringDecoder;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.*;
+import org.apache.spark.streaming.dstream.ReceiverInputDStream;
 import org.apache.spark.streaming.kafka.KafkaUtils;
 import scala.Tuple2;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -38,6 +38,9 @@ public class KafkaDataSource {
         Map<String, Integer> threadMap = new HashMap<>(1);
         threadMap.put(TOPIC, 1);
         JavaPairInputDStream<String, String> javaPairInputDStream = KafkaUtils.createStream(javaStreamingContext, HOST, GROUP, threadMap);
+        // sparkStreaming读取kafka数据的两种方式
+        // 1.receiver方式
+        JavaPairReceiverInputDStream<String, String> receiverInputDStream = KafkaUtils.createStream(javaStreamingContext, HOST,GROUP,threadMap);
         JavaDStream<String> words = javaPairInputDStream.flatMap(new FlatMapFunction<Tuple2<String, String>, String>() {
             @Override
             public Iterator<String> call(Tuple2<String, String> stringStringTuple2) {
@@ -45,6 +48,12 @@ public class KafkaDataSource {
             }
         });
 
+        Set<String> topicSet = new HashSet<>();
+        topicSet.add(TOPIC);
+        Map<String, String> kafkaParams = new HashMap<>(10);
+        kafkaParams.put("bootstrap.server", "192.168.11.200:9092");
+        // 2.直接读取方式
+        KafkaUtils.createDirectStream(javaStreamingContext, String.class, String.class, StringDecoder.class, StringDecoder.class, kafkaParams, topicSet);
         //统计
         JavaPairDStream<String, Integer> result = words.mapToPair(new PairFunction<String, String, Integer>() {
             @Override

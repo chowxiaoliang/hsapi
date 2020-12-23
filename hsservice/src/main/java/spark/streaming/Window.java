@@ -7,6 +7,7 @@ import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.apache.spark.streaming.kafka.KafkaUtils;
 import scala.Tuple2;
 
 /**
@@ -28,7 +29,6 @@ public class Window {
         JavaStreamingContext javaStreamingContext = new JavaStreamingContext(sparkConf, Durations.seconds(5));
 
         JavaReceiverInputDStream<String> javaReceiverInputDStream = javaStreamingContext.socketTextStream("localhost", 9999);
-
         JavaDStream<String> javaDStream = javaReceiverInputDStream.map( x -> x.split(" ")[0]);
         JavaPairDStream<String, Integer> javaPairDStream = javaDStream.mapToPair(x -> new Tuple2<>(x, 1));
 
