@@ -20,11 +20,11 @@ import java.util.regex.Pattern;
  */
 public class KafkaDataSource {
 
-    private static final String HOST = "192.168.11.200:9092";
+    private static final String HOST = "192.168.9.31:9092";
 
     private static final String GROUP = "vsim2";
 
-    private static final String TOPIC = "vsim2sync";
+    private static final String TOPIC = "kfk";
 
     /**
      * 数据分割的规则
@@ -48,12 +48,12 @@ public class KafkaDataSource {
             }
         });
 
-        Set<String> topicSet = new HashSet<>();
-        topicSet.add(TOPIC);
-        Map<String, String> kafkaParams = new HashMap<>(10);
-        kafkaParams.put("bootstrap.server", "192.168.11.200:9092");
-        // 2.直接读取方式
-        KafkaUtils.createDirectStream(javaStreamingContext, String.class, String.class, StringDecoder.class, StringDecoder.class, kafkaParams, topicSet);
+//        Set<String> topicSet = new HashSet<>();
+//        topicSet.add(TOPIC);
+//        Map<String, String> kafkaParams = new HashMap<>(10);
+//        kafkaParams.put("bootstrap.server", "192.168.11.200:9092");
+//        // 2.直接读取方式
+//        KafkaUtils.createDirectStream(javaStreamingContext, String.class, String.class, StringDecoder.class, StringDecoder.class, kafkaParams, topicSet);
         //统计
         JavaPairDStream<String, Integer> result = words.mapToPair(new PairFunction<String, String, Integer>() {
             @Override
