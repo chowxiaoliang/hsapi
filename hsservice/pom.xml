@@ -13,7 +13,7 @@
         <logback.version>1.0.7</logback.version>
         <scala.version>2.11.12</scala.version>
         <scala.binary.version>2.11</scala.binary.version>
-        <hadoop.version>2.6.0</hadoop.version>
+        <hadoop.version>2.7.0</hadoop.version>
         <flink.version>1.6.1</flink.version>
 
         <spark.first.scala.binary.version>2.11</spark.first.scala.binary.version>
